@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI 任務基地｜15 題互動挑戰</title>
+<style>
+:root{
+  --navy:#111831;--purple:#6657e8;--blue:#4f9df8;--mint:#3bcf9a;
+  --pink:#ff789a;--yellow:#ffd466;--paper:#fff;--ink:#1f2937;--muted:#667085;--line:#e7e9f2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(79,157,248,.24),transparent 30%),
+    radial-gradient(circle at 100% 20%,rgba(255,120,154,.20),transparent 28%),
+    linear-gradient(135deg,#10162c,#211c4c);
+}
+.page{max-width:760px;margin:0 auto;padding:18px 14px 58px}
+.screen{
+  display:none;background:rgba(255,255,255,.985);border-radius:24px;padding:24px 20px;
+  box-shadow:0 20px 55px rgba(0,0,0,.23);border:1px solid rgba(255,255,255,.7)
+}
+.quiz-screen:target,#finish:target{display:block}
+#home{display:block}
+.quiz-screen:target ~ #home,#finish:target ~ #home{display:none}
+
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stage{background:#eeecff;color:#5142c8;border-radius:999px;padding:7px 10px;font-size:.86rem;font-weight:900}
+.count{white-space:nowrap;color:var(--muted);font-size:.9rem;font-weight:800}
+.bar{height:9px;background:#eef0f5;border-radius:999px;overflow:hidden;margin:15px 0 20px}
+.fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--mint))}
+h1{font-size:clamp(2rem,8vw,3.45rem);line-height:1.06;margin:0 0 14px}
+h2{font-size:1.35rem;line-height:1.55;margin:18px 0}
+p{line-height:1.75;color:#4b5563}
+.hero-icon{font-size:3.4rem;margin-bottom:8px}
+.kicker{display:inline-block;background:#ede9fe;color:#5b21b6;padding:7px 11px;border-radius:999px;font-weight:900;font-size:.9rem;margin-bottom:12px}
+.mission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.mini{padding:14px 10px;border-radius:16px;text-align:center;font-weight:850;background:#f8f8ff;border:1px solid #e9e9ff;line-height:1.5}
+.notice{background:#fff8db;border:1px solid #ffe08d;border-radius:16px;padding:14px;line-height:1.75;color:#5d4700;margin:16px 0}
+.visual{border-radius:20px;overflow:hidden;background:#f7f8fc;border:1px solid #e7e9f2;margin:14px 0 18px}
+.visual svg{display:block;width:100%;height:auto}
+.reading{background:#f8f9fd;border:1px solid #e5e8f1;border-radius:18px;padding:17px 17px 10px;margin:14px 0 20px}
+.reading-title{font-weight:950;color:#4c3fc2;margin-bottom:8px}
+.reading p{margin-top:0;color:#364152;line-height:1.85}
+input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+.choice{display:flex;align-items:flex-start;gap:11px;border:2px solid var(--line);border-radius:16px;padding:14px;margin:10px 0;background:#fff;cursor:pointer;line-height:1.55;font-weight:750;transition:.15s}
+.choice:hover{border-color:#b9c2ff;background:#fbfbff;transform:translateY(-1px)}
+.letter{width:30px;height:30px;flex:0 0 auto;display:grid;place-items:center;background:#f0f2f7;border-radius:10px;font-weight:1000;color:#4b5563}
+.feedback{display:none;margin-top:17px;padding:16px;border-radius:16px;line-height:1.7}
+.feedback.good{background:#effdf6;color:#065f46;border:1px solid #b5efd1}
+.feedback.bad{background:#fff3f6;color:#9f1239;border:1px solid #ffc4d1}
+.next{display:block;text-align:center;text-decoration:none;color:white;background:linear-gradient(135deg,var(--purple),var(--blue));padding:14px 16px;border-radius:15px;font-weight:950;margin-top:14px;box-shadow:0 8px 20px rgba(102,87,232,.18)}
+
+.score-card{text-align:center;padding:18px 10px 8px}
+.score-number{font-size:4.4rem;font-weight:1000;line-height:1;color:#5c4ee4}
+.badge{display:inline-block;margin:12px auto;padding:9px 15px;border-radius:999px;background:#f0edff;color:#5142c8;font-weight:1000;font-size:1.1rem}
+.rank-note{max-width:560px;margin:0 auto 18px;color:#4b5563;line-height:1.7}
+.title-table{display:grid;gap:8px;margin:18px 0}
+.title-row{display:flex;justify-content:space-between;gap:12px;background:#f8f9fd;border:1px solid #e7e9f2;border-radius:13px;padding:11px 13px;font-size:.92rem}
+.selfbox{margin-top:22px;padding-top:20px;border-top:2px dashed #e3e5ed}
+.selfrow{padding:15px 0;border-bottom:1px solid #eef0f4}
+.selfq{font-weight:850;line-height:1.55;margin-bottom:10px}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.scale input{position:absolute;opacity:0;pointer-events:none}
+.scale label{text-align:center;padding:10px 4px;border:1.5px solid #e2e5ed;border-radius:12px;cursor:pointer;background:#fff;font-weight:850;font-size:.9rem}
+.scale input:checked + label{background:#eeecff;border-color:#7568e9;color:#5142c8}
+.self-result{display:none;margin-top:16px;padding:15px;border-radius:15px;background:#eef8ff;border:1px solid #cfe5ff;line-height:1.7}
+.home-link{display:block;text-align:center;text-decoration:none;background:#172033;color:#fff;padding:14px;border-radius:14px;font-weight:900;margin-top:15px}
+.small{font-size:.88rem;color:#7a8292}
+#q1a:checked ~ label[for="q1a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q1a:checked ~ .f1a{display:block}
+#q1b:checked ~ label[for="q1b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q1b:checked ~ .f1b{display:block}
+#q1c:checked ~ label[for="q1c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q1c:checked ~ .f1c{display:block}
+#q1d:checked ~ label[for="q1d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q1d:checked ~ .f1d{display:block}
+#q2a:checked ~ label[for="q2a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q2a:checked ~ .f2a{display:block}
+#q2b:checked ~ label[for="q2b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q2b:checked ~ .f2b{display:block}
+#q2c:checked ~ label[for="q2c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q2c:checked ~ .f2c{display:block}
+#q2d:checked ~ label[for="q2d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q2d:checked ~ .f2d{display:block}
+#q3a:checked ~ label[for="q3a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q3a:checked ~ .f3a{display:block}
+#q3b:checked ~ label[for="q3b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q3b:checked ~ .f3b{display:block}
+#q3c:checked ~ label[for="q3c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q3c:checked ~ .f3c{display:block}
+#q3d:checked ~ label[for="q3d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q3d:checked ~ .f3d{display:block}
+#q4a:checked ~ label[for="q4a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q4a:checked ~ .f4a{display:block}
+#q4b:checked ~ label[for="q4b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q4b:checked ~ .f4b{display:block}
+#q4c:checked ~ label[for="q4c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q4c:checked ~ .f4c{display:block}
+#q4d:checked ~ label[for="q4d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q4d:checked ~ .f4d{display:block}
+#q5a:checked ~ label[for="q5a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q5a:checked ~ .f5a{display:block}
+#q5b:checked ~ label[for="q5b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q5b:checked ~ .f5b{display:block}
+#q5c:checked ~ label[for="q5c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q5c:checked ~ .f5c{display:block}
+#q5d:checked ~ label[for="q5d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q5d:checked ~ .f5d{display:block}
+#q6a:checked ~ label[for="q6a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q6a:checked ~ .f6a{display:block}
+#q6b:checked ~ label[for="q6b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q6b:checked ~ .f6b{display:block}
+#q6c:checked ~ label[for="q6c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q6c:checked ~ .f6c{display:block}
+#q6d:checked ~ label[for="q6d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q6d:checked ~ .f6d{display:block}
+#q7a:checked ~ label[for="q7a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q7a:checked ~ .f7a{display:block}
+#q7b:checked ~ label[for="q7b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q7b:checked ~ .f7b{display:block}
+#q7c:checked ~ label[for="q7c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q7c:checked ~ .f7c{display:block}
+#q7d:checked ~ label[for="q7d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q7d:checked ~ .f7d{display:block}
+#q8a:checked ~ label[for="q8a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q8a:checked ~ .f8a{display:block}
+#q8b:checked ~ label[for="q8b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q8b:checked ~ .f8b{display:block}
+#q8c:checked ~ label[for="q8c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q8c:checked ~ .f8c{display:block}
+#q8d:checked ~ label[for="q8d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q8d:checked ~ .f8d{display:block}
+#q9a:checked ~ label[for="q9a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q9a:checked ~ .f9a{display:block}
+#q9b:checked ~ label[for="q9b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q9b:checked ~ .f9b{display:block}
+#q9c:checked ~ label[for="q9c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q9c:checked ~ .f9c{display:block}
+#q9d:checked ~ label[for="q9d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q9d:checked ~ .f9d{display:block}
+#q10a:checked ~ label[for="q10a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q10a:checked ~ .f10a{display:block}
+#q10b:checked ~ label[for="q10b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q10b:checked ~ .f10b{display:block}
+#q10c:checked ~ label[for="q10c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q10c:checked ~ .f10c{display:block}
+#q10d:checked ~ label[for="q10d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q10d:checked ~ .f10d{display:block}
+#q11a:checked ~ label[for="q11a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q11a:checked ~ .f11a{display:block}
+#q11b:checked ~ label[for="q11b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q11b:checked ~ .f11b{display:block}
+#q11c:checked ~ label[for="q11c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q11c:checked ~ .f11c{display:block}
+#q11d:checked ~ label[for="q11d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q11d:checked ~ .f11d{display:block}
+#q12a:checked ~ label[for="q12a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q12a:checked ~ .f12a{display:block}
+#q12b:checked ~ label[for="q12b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q12b:checked ~ .f12b{display:block}
+#q12c:checked ~ label[for="q12c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q12c:checked ~ .f12c{display:block}
+#q12d:checked ~ label[for="q12d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q12d:checked ~ .f12d{display:block}
+#q13a:checked ~ label[for="q13a"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q13a:checked ~ .f13a{display:block}
+#q13b:checked ~ label[for="q13b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q13b:checked ~ .f13b{display:block}
+#q13c:checked ~ label[for="q13c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q13c:checked ~ .f13c{display:block}
+#q13d:checked ~ label[for="q13d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q13d:checked ~ .f13d{display:block}
+#q14a:checked ~ label[for="q14a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q14a:checked ~ .f14a{display:block}
+#q14b:checked ~ label[for="q14b"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q14b:checked ~ .f14b{display:block}
+#q14c:checked ~ label[for="q14c"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q14c:checked ~ .f14c{display:block}
+#q14d:checked ~ label[for="q14d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q14d:checked ~ .f14d{display:block}
+#q15a:checked ~ label[for="q15a"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q15a:checked ~ .f15a{display:block}
+#q15b:checked ~ label[for="q15b"]{border-color:#49c98e;background:#effdf6;box-shadow:0 0 0 3px rgba(73,201,142,.09)}
+#q15b:checked ~ .f15b{display:block}
+#q15c:checked ~ label[for="q15c"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q15c:checked ~ .f15c{display:block}
+#q15d:checked ~ label[for="q15d"]{border-color:#ff8fa8;background:#fff3f6;box-shadow:0 0 0 3px rgba(255,143,168,.08)}
+#q15d:checked ~ .f15d{display:block}
+@media(max-width:560px){
+  .screen{padding:20px 14px;border-radius:18px}
+  .mission-grid{grid-template-columns:1fr}
+  h2{font-size:1.19rem}
+  .toprow{align-items:flex-start}
+  .scale label{font-size:.8rem;padding:9px 2px}
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<section class="screen quiz-screen" id="q1">
+<div class="toprow"><span class="stage">🕵️ LEVEL 1｜真假訊號站</span><span class="count">第 1 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:7%"></div></div>
+<h2>網路上認識的人和你視訊過，之後突然開口要你匯錢。依照資料，哪一個判斷最重要？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q1" id="q1a">
+<input autocomplete="off" type="radio" data-correct="0" name="q1" id="q1b">
+<input autocomplete="off" type="radio" data-correct="1" name="q1" id="q1c">
+<input autocomplete="off" type="radio" data-correct="0" name="q1" id="q1d">
+<label class="choice" for="q1a"><span class="letter">A</span><span>有視訊過，所以身分一定是真的</span></label>
+<label class="choice" for="q1b"><span class="letter">B</span><span>先看對方長得像不像照片</span></label>
+<label class="choice" for="q1c"><span class="letter">C</span><span>注意對方是否主動索取貴重財物</span></label>
+<label class="choice" for="q1d"><span class="letter">D</span><span>只要聊天夠久，就可以相信</span></label>
+<div class="feedback bad f1a"><strong>💡 這題再想一下</strong><br>資料沒有把「視訊過、聊天久、照片像」當成足以確認身分的依據。<a class="next" href="#q2">下一題 →</a></div>
+<div class="feedback bad f1b"><strong>💡 這題再想一下</strong><br>資料沒有把「視訊過、聊天久、照片像」當成足以確認身分的依據。<a class="next" href="#q2">下一題 →</a></div>
+<div class="feedback good f1c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料的學習重點是：聲音與影像已不能單獨判定真偽；對方開始索取貴重財物時尤其要提高警覺。<a class="next" href="#q2">下一題 →</a></div>
+<div class="feedback bad f1d"><strong>💡 這題再想一下</strong><br>資料沒有把「視訊過、聊天久、照片像」當成足以確認身分的依據。<a class="next" href="#q2">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q2">
+<div class="toprow"><span class="stage">🎥 LEVEL 1｜圖片情境</span><span class="count">第 2 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:13%"></div></div>
+<div class="visual">
+<svg viewBox="0 0 760 360" role="img" aria-label="視訊交友情境：畫面中的人要求購買點數" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0" stop-color="#5b5cf0"/>
+      <stop offset="1" stop-color="#8a63f6"/>
+    </linearGradient>
+  </defs>
+  <rect width="760" height="360" rx="28" fill="#f2f4ff"/>
+  <rect x="34" y="26" width="330" height="308" rx="30" fill="#181c36"/>
+  <rect x="56" y="50" width="286" height="218" rx="22" fill="url(#g1)"/>
+  <circle cx="199" cy="125" r="46" fill="#ffd8c7"/>
+  <path d="M150 125c0-58 97-64 99 1-17-14-32-20-49-20-18 0-33 6-50 19Z" fill="#493a58"/>
+  <rect x="131" y="177" width="138" height="67" rx="34" fill="#fff" opacity=".92"/>
+  <circle cx="321" cy="72" r="12" fill="#ff647c"/>
+  <text x="75" y="304" font-family="sans-serif" font-size="20" fill="#fff">視訊中…</text>
+
+  <rect x="402" y="42" width="318" height="98" rx="22" fill="#fff"/>
+  <text x="430" y="78" font-family="sans-serif" font-size="19" font-weight="700" fill="#262b44">「我的帳戶突然被鎖住」</text>
+  <text x="430" y="108" font-family="sans-serif" font-size="19" fill="#4b5563">可以幫我買 3,000 元點數嗎？</text>
+
+  <rect x="432" y="162" width="288" height="70" rx="20" fill="#fff3f6" stroke="#ff9ab1" stroke-width="2"/>
+  <text x="458" y="204" font-family="sans-serif" font-size="20" font-weight="700" fill="#9f1239">「我們都視訊過了耶！」</text>
+
+  <rect x="402" y="258" width="318" height="56" rx="18" fill="#fff8d9"/>
+  <text x="426" y="293" font-family="sans-serif" font-size="18" font-weight="700" fill="#7a5a00">你會怎麼判斷？</text>
+</svg>
+</div>
+<h2>看完上面的情境，哪一個地方最值得你立刻提高警覺？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q2" id="q2a">
+<input autocomplete="off" type="radio" data-correct="1" name="q2" id="q2b">
+<input autocomplete="off" type="radio" data-correct="0" name="q2" id="q2c">
+<input autocomplete="off" type="radio" data-correct="0" name="q2" id="q2d">
+<label class="choice" for="q2a"><span class="letter">A</span><span>對方的畫面很清楚</span></label>
+<label class="choice" for="q2b"><span class="letter">B</span><span>對方說帳戶被鎖，接著要求你買 3,000 元點數</span></label>
+<label class="choice" for="q2c"><span class="letter">C</span><span>對方願意跟你視訊</span></label>
+<label class="choice" for="q2d"><span class="letter">D</span><span>對方說話很自然</span></label>
+<div class="feedback bad f2a"><strong>💡 這題再想一下</strong><br>畫面清楚、聲音自然、願意視訊，都不能取代對「索取財物」這個行為的判斷。<a class="next" href="#q3">下一題 →</a></div>
+<div class="feedback good f2b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>關鍵不是畫面清不清楚，而是對方開始索取具有金錢價值的東西；資料也提醒影像、聲音不能單獨證明真人身分。<a class="next" href="#q3">下一題 →</a></div>
+<div class="feedback bad f2c"><strong>💡 這題再想一下</strong><br>畫面清楚、聲音自然、願意視訊，都不能取代對「索取財物」這個行為的判斷。<a class="next" href="#q3">下一題 →</a></div>
+<div class="feedback bad f2d"><strong>💡 這題再想一下</strong><br>畫面清楚、聲音自然、願意視訊，都不能取代對「索取財物」這個行為的判斷。<a class="next" href="#q3">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q3">
+<div class="toprow"><span class="stage">💸 LEVEL 1｜真假訊號站</span><span class="count">第 3 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:20%"></div></div>
+<h2>下列哪一個情況最符合資料中的詐騙警訊？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q3" id="q3a">
+<input autocomplete="off" type="radio" data-correct="0" name="q3" id="q3b">
+<input autocomplete="off" type="radio" data-correct="1" name="q3" id="q3c">
+<input autocomplete="off" type="radio" data-correct="0" name="q3" id="q3d">
+<label class="choice" for="q3a"><span class="letter">A</span><span>網友問你今天吃什麼</span></label>
+<label class="choice" for="q3b"><span class="letter">B</span><span>網友推薦一首歌</span></label>
+<label class="choice" for="q3c"><span class="letter">C</span><span>網友請你先幫忙轉帳一筆錢</span></label>
+<label class="choice" for="q3d"><span class="letter">D</span><span>網友分享旅遊照片</span></label>
+<div class="feedback bad f3a"><strong>💡 這題再想一下</strong><br>資料中特別被提醒的是「主動索取貴重財物」，不是一般聊天內容。<a class="next" href="#q4">下一題 →</a></div>
+<div class="feedback bad f3b"><strong>💡 這題再想一下</strong><br>資料中特別被提醒的是「主動索取貴重財物」，不是一般聊天內容。<a class="next" href="#q4">下一題 →</a></div>
+<div class="feedback good f3c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>主動索取金錢或其他貴重財物，是資料特別提醒要提高警覺的行為。<a class="next" href="#q4">下一題 →</a></div>
+<div class="feedback bad f3d"><strong>💡 這題再想一下</strong><br>資料中特別被提醒的是「主動索取貴重財物」，不是一般聊天內容。<a class="next" href="#q4">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q4">
+<div class="toprow"><span class="stage">📖 LEVEL 1｜閱讀理解</span><span class="count">第 4 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:27%"></div></div>
+<article class="reading"><div class="reading-title">📖 閱讀資料</div><p>課程資料整理了一起深偽 AI 交友詐騙案例。該集團自行開發深偽 AI 技術及相關程式，用來偽裝身分並進行交友詐騙。資料指出，被害人數量非常多，也特別提醒：在現在的網路世界裡，聲音和影像已經不能單獨作為判斷真人身分的依據；判斷時更應注意對方是否開始主動索取貴重財物。</p></article>
+<h2>根據這段資料，作者最想提醒讀者的是什麼？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q4" id="q4a">
+<input autocomplete="off" type="radio" data-correct="0" name="q4" id="q4b">
+<input autocomplete="off" type="radio" data-correct="1" name="q4" id="q4c">
+<input autocomplete="off" type="radio" data-correct="0" name="q4" id="q4d">
+<label class="choice" for="q4a"><span class="letter">A</span><span>只要不開視訊就不會被騙</span></label>
+<label class="choice" for="q4b"><span class="letter">B</span><span>網路上所有人都是假的</span></label>
+<label class="choice" for="q4c"><span class="letter">C</span><span>不要只靠聲音影像判定真人，還要觀察是否出現索取財物等行為</span></label>
+<label class="choice" for="q4d"><span class="letter">D</span><span>深偽技術只會出現在交友軟體</span></label>
+<div class="feedback bad f4a"><strong>💡 這題再想一下</strong><br>這段資料沒有說「所有網友都是假的」，也沒有把風險限定在單一平台。<a class="next" href="#q5">下一題 →</a></div>
+<div class="feedback bad f4b"><strong>💡 這題再想一下</strong><br>這段資料沒有說「所有網友都是假的」，也沒有把風險限定在單一平台。<a class="next" href="#q5">下一題 →</a></div>
+<div class="feedback good f4c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>這正是資料整理出的學習重點：辨識身分不能只看聲音與影像，還要注意對方的行為。<a class="next" href="#q5">下一題 →</a></div>
+<div class="feedback bad f4d"><strong>💡 這題再想一下</strong><br>這段資料沒有說「所有網友都是假的」，也沒有把風險限定在單一平台。<a class="next" href="#q5">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q5">
+<div class="toprow"><span class="stage">🧠 LEVEL 1｜真假訊號站</span><span class="count">第 5 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:33%"></div></div>
+<h2>如果對方有漂亮照片、自然聲音、順暢視訊，但最後開始索取貴重財物，你應該？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q5" id="q5a">
+<input autocomplete="off" type="radio" data-correct="0" name="q5" id="q5b">
+<input autocomplete="off" type="radio" data-correct="1" name="q5" id="q5c">
+<input autocomplete="off" type="radio" data-correct="0" name="q5" id="q5d">
+<label class="choice" for="q5a"><span class="letter">A</span><span>因為前面都很真，所以照做</span></label>
+<label class="choice" for="q5b"><span class="letter">B</span><span>因為聊很久，所以不用懷疑</span></label>
+<label class="choice" for="q5c"><span class="letter">C</span><span>提高警覺，不把影像和聲音當成唯一判斷依據</span></label>
+<label class="choice" for="q5d"><span class="letter">D</span><span>只要金額不大就沒關係</span></label>
+<div class="feedback bad f5a"><strong>💡 這題再想一下</strong><br>資料核心就是：即使聲音影像看似真實，也不能直接當成身分證明。<a class="next" href="#q6">下一題 →</a></div>
+<div class="feedback bad f5b"><strong>💡 這題再想一下</strong><br>資料核心就是：即使聲音影像看似真實，也不能直接當成身分證明。<a class="next" href="#q6">下一題 →</a></div>
+<div class="feedback good f5c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>你抓到資料真正想教的判斷方式：不要只被聲音與影像說服，要注意是否開始索取財物。<a class="next" href="#q6">下一題 →</a></div>
+<div class="feedback bad f5d"><strong>💡 這題再想一下</strong><br>資料核心就是：即使聲音影像看似真實，也不能直接當成身分證明。<a class="next" href="#q6">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q6">
+<div class="toprow"><span class="stage">🔎 LEVEL 2｜查證實驗室</span><span class="count">第 6 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:40%"></div></div>
+<h2>AI 回答一個日常知識問題後附上來源，你下一步最符合資料建議的做法是？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q6" id="q6a">
+<input autocomplete="off" type="radio" data-correct="1" name="q6" id="q6b">
+<input autocomplete="off" type="radio" data-correct="0" name="q6" id="q6c">
+<input autocomplete="off" type="radio" data-correct="0" name="q6" id="q6d">
+<label class="choice" for="q6a"><span class="letter">A</span><span>有附來源就直接相信</span></label>
+<label class="choice" for="q6b"><span class="letter">B</span><span>點進來源，看來源從哪裡來、內容是否合理</span></label>
+<label class="choice" for="q6c"><span class="letter">C</span><span>看 AI 語氣有沒有很肯定</span></label>
+<label class="choice" for="q6d"><span class="letter">D</span><span>只看搜尋結果標題</span></label>
+<div class="feedback bad f6a"><strong>💡 這題再想一下</strong><br>資料不是說「有來源就一定正確」，而是要實際點進去看。<a class="next" href="#q7">下一題 →</a></div>
+<div class="feedback good f6b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料明確寫到：要點進 AI 回傳的資料來源，確認來源與內容是否合理。<a class="next" href="#q7">下一題 →</a></div>
+<div class="feedback bad f6c"><strong>💡 這題再想一下</strong><br>資料不是說「有來源就一定正確」，而是要實際點進去看。<a class="next" href="#q7">下一題 →</a></div>
+<div class="feedback bad f6d"><strong>💡 這題再想一下</strong><br>資料不是說「有來源就一定正確」，而是要實際點進去看。<a class="next" href="#q7">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q7">
+<div class="toprow"><span class="stage">🧾 LEVEL 2｜圖片情境</span><span class="count">第 7 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:47%"></div></div>
+<div class="visual">
+<svg viewBox="0 0 760 380" role="img" aria-label="AI 回答附上三個不同類型的資料來源" xmlns="http://www.w3.org/2000/svg">
+  <rect width="760" height="380" rx="28" fill="#eef8ff"/>
+  <rect x="38" y="34" width="684" height="86" rx="22" fill="#ffffff" stroke="#cfe5ff" stroke-width="2"/>
+  <circle cx="83" cy="77" r="24" fill="#5b5cf0"/>
+  <text x="75" y="85" font-family="sans-serif" font-size="22" font-weight="800" fill="#fff">AI</text>
+  <text x="124" y="68" font-family="sans-serif" font-size="18" font-weight="700" fill="#26324b">植物細胞有細胞壁。</text>
+  <text x="124" y="96" font-family="sans-serif" font-size="16" fill="#667085">以下是我找到的三個「來源」：</text>
+
+  <rect x="38" y="150" width="210" height="178" rx="20" fill="#fff"/>
+  <circle cx="76" cy="188" r="22" fill="#f1f3f7"/>
+  <text x="68" y="196" font-family="sans-serif" font-size="22">💬</text>
+  <text x="108" y="190" font-family="sans-serif" font-size="17" font-weight="800" fill="#273149">匿名論壇</text>
+  <text x="60" y="229" font-family="sans-serif" font-size="15" fill="#6b7280">作者：coolboy777</text>
+  <text x="60" y="255" font-family="sans-serif" font-size="15" fill="#6b7280">日期：不明</text>
+  <text x="60" y="291" font-family="sans-serif" font-size="15" fill="#6b7280">「我記得有吧」</text>
+
+  <rect x="275" y="150" width="210" height="178" rx="20" fill="#fff" stroke="#75d7b0" stroke-width="2"/>
+  <circle cx="313" cy="188" r="22" fill="#e9fbf3"/>
+  <text x="305" y="196" font-family="sans-serif" font-size="22">🏫</text>
+  <text x="345" y="190" font-family="sans-serif" font-size="17" font-weight="800" fill="#273149">教育單位教材</text>
+  <text x="297" y="229" font-family="sans-serif" font-size="15" fill="#6b7280">機構、作者清楚</text>
+  <text x="297" y="255" font-family="sans-serif" font-size="15" fill="#6b7280">有更新日期</text>
+  <text x="297" y="291" font-family="sans-serif" font-size="15" fill="#6b7280">內容可查看</text>
+
+  <rect x="512" y="150" width="210" height="178" rx="20" fill="#fff"/>
+  <circle cx="550" cy="188" r="22" fill="#fff1f4"/>
+  <text x="542" y="196" font-family="sans-serif" font-size="22">📱</text>
+  <text x="582" y="190" font-family="sans-serif" font-size="17" font-weight="800" fill="#273149">短影音截圖</text>
+  <text x="534" y="229" font-family="sans-serif" font-size="15" fill="#6b7280">觀看數很多</text>
+  <text x="534" y="255" font-family="sans-serif" font-size="15" fill="#6b7280">原始出處不清楚</text>
+  <text x="534" y="291" font-family="sans-serif" font-size="15" fill="#6b7280">只有截圖</text>
+</svg>
+</div>
+<h2>如果你要確認 AI 的答案，上圖三個來源中，依照資料原則，哪一個最值得先查看？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q7" id="q7a">
+<input autocomplete="off" type="radio" data-correct="1" name="q7" id="q7b">
+<input autocomplete="off" type="radio" data-correct="0" name="q7" id="q7c">
+<input autocomplete="off" type="radio" data-correct="0" name="q7" id="q7d">
+<label class="choice" for="q7a"><span class="letter">A</span><span>匿名論壇留言</span></label>
+<label class="choice" for="q7b"><span class="letter">B</span><span>教育單位教材</span></label>
+<label class="choice" for="q7c"><span class="letter">C</span><span>只有截圖的短影音</span></label>
+<label class="choice" for="q7d"><span class="letter">D</span><span>三個都不用看，AI 已經回答了</span></label>
+<div class="feedback bad f7a"><strong>💡 這題再想一下</strong><br>只看人氣、截圖或匿名留言，無法取代對來源本身的確認。<a class="next" href="#q8">下一題 →</a></div>
+<div class="feedback good f7b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料要求確認來源是否合理；作者、機構與內容都較清楚的來源，更符合查證的方向。<a class="next" href="#q8">下一題 →</a></div>
+<div class="feedback bad f7c"><strong>💡 這題再想一下</strong><br>只看人氣、截圖或匿名留言，無法取代對來源本身的確認。<a class="next" href="#q8">下一題 →</a></div>
+<div class="feedback bad f7d"><strong>💡 這題再想一下</strong><br>只看人氣、截圖或匿名留言，無法取代對來源本身的確認。<a class="next" href="#q8">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q8">
+<div class="toprow"><span class="stage">🏫 LEVEL 2｜查證實驗室</span><span class="count">第 8 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:53%"></div></div>
+<h2>你問 AI 一個專業問題。依照資料，最重要的是？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q8" id="q8a">
+<input autocomplete="off" type="radio" data-correct="1" name="q8" id="q8b">
+<input autocomplete="off" type="radio" data-correct="0" name="q8" id="q8c">
+<input autocomplete="off" type="radio" data-correct="0" name="q8" id="q8d">
+<label class="choice" for="q8a"><span class="letter">A</span><span>只要 AI 說得詳細就可以</span></label>
+<label class="choice" for="q8b"><span class="letter">B</span><span>確認資料來源有公信力，最後再詢問老師或專業人員</span></label>
+<label class="choice" for="q8c"><span class="letter">C</span><span>問很多次 AI，答案一樣就代表一定正確</span></label>
+<label class="choice" for="q8d"><span class="letter">D</span><span>只看網友留言</span></label>
+<div class="feedback bad f8a"><strong>💡 這題再想一下</strong><br>專業問題不能只靠 AI 自己反覆回答來完成查證。<a class="next" href="#q9">下一題 →</a></div>
+<div class="feedback good f8b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料明確要求：專業問題要確認有公信力的資料來源，最後還要詢問學校老師或專業人員。<a class="next" href="#q9">下一題 →</a></div>
+<div class="feedback bad f8c"><strong>💡 這題再想一下</strong><br>專業問題不能只靠 AI 自己反覆回答來完成查證。<a class="next" href="#q9">下一題 →</a></div>
+<div class="feedback bad f8d"><strong>💡 這題再想一下</strong><br>專業問題不能只靠 AI 自己反覆回答來完成查證。<a class="next" href="#q9">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q9">
+<div class="toprow"><span class="stage">📚 LEVEL 2｜閱讀理解</span><span class="count">第 9 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:60%"></div></div>
+<article class="reading"><div class="reading-title">📖 閱讀資料</div><p>資料把 AI 的「查詢、整理現有資料」分成專業問題與日常問題。像喉嚨痛、家中內部電線更新、法律問題，被列為專業問題：不只要確認資料來源具有公信力，真的要採取行動前，還應詢問學校老師或專業人員。至於歷史常識、植物細胞壁、腳踏車落鏈、讀書計畫或旅遊行程等日常問題，也仍然要確認 AI 提供的資訊是否正確，並實際查看它引用的來源。</p></article>
+<h2>從這段資料可以得到哪一個最完整的結論？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q9" id="q9a">
+<input autocomplete="off" type="radio" data-correct="0" name="q9" id="q9b">
+<input autocomplete="off" type="radio" data-correct="1" name="q9" id="q9c">
+<input autocomplete="off" type="radio" data-correct="0" name="q9" id="q9d">
+<label class="choice" for="q9a"><span class="letter">A</span><span>只有專業問題需要查證</span></label>
+<label class="choice" for="q9b"><span class="letter">B</span><span>日常問題一定不會出錯</span></label>
+<label class="choice" for="q9c"><span class="letter">C</span><span>不同問題風險不同，但不論專業或日常，都需要確認資訊；專業問題還要再找專業人士</span></label>
+<label class="choice" for="q9d"><span class="letter">D</span><span>只要 AI 有引用來源，所有問題都可以直接照做</span></label>
+<div class="feedback bad f9a"><strong>💡 這題再想一下</strong><br>資料其實對日常問題也要求確認資訊；專業問題則有更高的查證要求。<a class="next" href="#q10">下一題 →</a></div>
+<div class="feedback bad f9b"><strong>💡 這題再想一下</strong><br>資料其實對日常問題也要求確認資訊；專業問題則有更高的查證要求。<a class="next" href="#q10">下一題 →</a></div>
+<div class="feedback good f9c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>這個選項同時保留了資料對兩類問題的差異：都要確認資訊，但專業問題還需要更進一步找老師或專業人士。<a class="next" href="#q10">下一題 →</a></div>
+<div class="feedback bad f9d"><strong>💡 這題再想一下</strong><br>資料其實對日常問題也要求確認資訊；專業問題則有更高的查證要求。<a class="next" href="#q10">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q10">
+<div class="toprow"><span class="stage">🗺️ LEVEL 2｜查證實驗室</span><span class="count">第 10 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:67%"></div></div>
+<h2>你請 AI 幫忙安排旅遊行程。依照資料，最符合的做法是？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q10" id="q10a">
+<input autocomplete="off" type="radio" data-correct="1" name="q10" id="q10b">
+<input autocomplete="off" type="radio" data-correct="0" name="q10" id="q10c">
+<input autocomplete="off" type="radio" data-correct="0" name="q10" id="q10d">
+<label class="choice" for="q10a"><span class="letter">A</span><span>AI 排完就一定正確</span></label>
+<label class="choice" for="q10b"><span class="letter">B</span><span>可以請 AI 整理，但仍要確認資訊是否合理</span></label>
+<label class="choice" for="q10c"><span class="letter">C</span><span>旅遊行程不能用 AI</span></label>
+<label class="choice" for="q10d"><span class="letter">D</span><span>只要內容很長就代表可信</span></label>
+<div class="feedback bad f10a"><strong>💡 這題再想一下</strong><br>資料沒有禁止這類使用，而是要求使用者自己確認資訊。<a class="next" href="#q11">下一題 →</a></div>
+<div class="feedback good f10b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料把安排旅遊行程列在日常問題中；AI 可以協助整理，但仍要確認資訊是否正確。<a class="next" href="#q11">下一題 →</a></div>
+<div class="feedback bad f10c"><strong>💡 這題再想一下</strong><br>資料沒有禁止這類使用，而是要求使用者自己確認資訊。<a class="next" href="#q11">下一題 →</a></div>
+<div class="feedback bad f10d"><strong>💡 這題再想一下</strong><br>資料沒有禁止這類使用，而是要求使用者自己確認資訊。<a class="next" href="#q11">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q11">
+<div class="toprow"><span class="stage">📐 LEVEL 3｜AI 學習訓練場</span><span class="count">第 11 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:73%"></div></div>
+<h2>如果你的目標是「真的學會數學」，哪一句 Prompt 最符合資料建議？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q11" id="q11a">
+<input autocomplete="off" type="radio" data-correct="0" name="q11" id="q11b">
+<input autocomplete="off" type="radio" data-correct="1" name="q11" id="q11c">
+<input autocomplete="off" type="radio" data-correct="0" name="q11" id="q11d">
+<label class="choice" for="q11a"><span class="letter">A</span><span>直接把答案告訴我</span></label>
+<label class="choice" for="q11b"><span class="letter">B</span><span>幫我把整份作業完成</span></label>
+<label class="choice" for="q11c"><span class="letter">C</span><span>不要直接給答案，請先給我一個提示</span></label>
+<label class="choice" for="q11d"><span class="letter">D</span><span>只告訴我最後答案</span></label>
+<div class="feedback bad f11a"><strong>💡 這題再想一下</strong><br>這會讓 AI 代替你思考，不符合資料想培養的自主學習。<a class="next" href="#q12">下一題 →</a></div>
+<div class="feedback bad f11b"><strong>💡 這題再想一下</strong><br>這會讓 AI 代替你思考，不符合資料想培養的自主學習。<a class="next" href="#q12">下一題 →</a></div>
+<div class="feedback good f11c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料強調：用 AI 學習時，要請 AI 提示自己思考，而不是直接提供正確答案。<a class="next" href="#q12">下一題 →</a></div>
+<div class="feedback bad f11d"><strong>💡 這題再想一下</strong><br>這會讓 AI 代替你思考，不符合資料想培養的自主學習。<a class="next" href="#q12">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q12">
+<div class="toprow"><span class="stage">💬 LEVEL 3｜圖片情境</span><span class="count">第 12 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:80%"></div></div>
+<div class="visual">
+<svg viewBox="0 0 760 390" role="img" aria-label="學生向 AI 問數學題，有直接給答案與提示式回答兩種方式" xmlns="http://www.w3.org/2000/svg">
+  <rect width="760" height="390" rx="28" fill="#f7f3ff"/>
+  <rect x="34" y="36" width="300" height="318" rx="24" fill="#fff"/>
+  <text x="60" y="76" font-family="sans-serif" font-size="19" font-weight="800" fill="#3c3356">做法 A</text>
+  <rect x="58" y="99" width="248" height="64" rx="18" fill="#eeeaff"/>
+  <text x="79" y="127" font-family="sans-serif" font-size="16" fill="#403970">「直接把答案告訴我」</text>
+  <text x="79" y="150" font-family="sans-serif" font-size="16" fill="#403970">「我要交作業」</text>
+  <rect x="92" y="190" width="214" height="90" rx="18" fill="#fff1f4"/>
+  <text x="112" y="222" font-family="sans-serif" font-size="16" fill="#9f1239">AI：完整解答如下…</text>
+  <text x="112" y="250" font-family="sans-serif" font-size="16" fill="#9f1239">答案是 42。</text>
+
+  <rect x="426" y="36" width="300" height="318" rx="24" fill="#fff"/>
+  <text x="452" y="76" font-family="sans-serif" font-size="19" font-weight="800" fill="#3c3356">做法 B</text>
+  <rect x="450" y="99" width="248" height="82" rx="18" fill="#eafbf4"/>
+  <text x="470" y="127" font-family="sans-serif" font-size="16" fill="#065f46">「不要直接給答案」</text>
+  <text x="470" y="152" font-family="sans-serif" font-size="16" fill="#065f46">「先提示我第一步」</text>
+  <rect x="484" y="205" width="214" height="98" rx="18" fill="#eef6ff"/>
+  <text x="504" y="233" font-family="sans-serif" font-size="16" fill="#245281">AI：先想想看，</text>
+  <text x="504" y="258" font-family="sans-serif" font-size="16" fill="#245281">題目要你找的是什麼？</text>
+  <text x="504" y="283" font-family="sans-serif" font-size="16" fill="#245281">你目前想到哪一步？</text>
+</svg>
+</div>
+<h2>上圖兩種問法中，哪一種更符合資料中的 AI 學習方式？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q12" id="q12a">
+<input autocomplete="off" type="radio" data-correct="1" name="q12" id="q12b">
+<input autocomplete="off" type="radio" data-correct="0" name="q12" id="q12c">
+<input autocomplete="off" type="radio" data-correct="0" name="q12" id="q12d">
+<label class="choice" for="q12a"><span class="letter">A</span><span>做法 A，因為拿答案最快</span></label>
+<label class="choice" for="q12b"><span class="letter">B</span><span>做法 B，因為 AI 只提供提示，保留自己的思考</span></label>
+<label class="choice" for="q12c"><span class="letter">C</span><span>兩種完全一樣</span></label>
+<label class="choice" for="q12d"><span class="letter">D</span><span>只要 AI 回答很多字就算學習</span></label>
+<div class="feedback bad f12a"><strong>💡 這題再想一下</strong><br>資料把「自己的思考」視為學習效果的重要部分，所以直接拿答案並不是主要目標。<a class="next" href="#q13">下一題 →</a></div>
+<div class="feedback good f12b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料建議讓 AI 給提示、指出盲點與提供參考資料，而不是直接代替學習者完成。<a class="next" href="#q13">下一題 →</a></div>
+<div class="feedback bad f12c"><strong>💡 這題再想一下</strong><br>資料把「自己的思考」視為學習效果的重要部分，所以直接拿答案並不是主要目標。<a class="next" href="#q13">下一題 →</a></div>
+<div class="feedback bad f12d"><strong>💡 這題再想一下</strong><br>資料把「自己的思考」視為學習效果的重要部分，所以直接拿答案並不是主要目標。<a class="next" href="#q13">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q13">
+<div class="toprow"><span class="stage">💡 LEVEL 3｜AI 學習訓練場</span><span class="count">第 13 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:87%"></div></div>
+<h2>資料建議 AI 在學習時可以提供哪一組協助？</h2>
+<input autocomplete="off" type="radio" data-correct="1" name="q13" id="q13a">
+<input autocomplete="off" type="radio" data-correct="0" name="q13" id="q13b">
+<input autocomplete="off" type="radio" data-correct="0" name="q13" id="q13c">
+<input autocomplete="off" type="radio" data-correct="0" name="q13" id="q13d">
+<label class="choice" for="q13a"><span class="letter">A</span><span>提示、思考盲點、參考資料</span></label>
+<label class="choice" for="q13b"><span class="letter">B</span><span>永遠直接給標準答案</span></label>
+<label class="choice" for="q13c"><span class="letter">C</span><span>幫你完全不用思考</span></label>
+<label class="choice" for="q13d"><span class="letter">D</span><span>只幫你把答案寫得更長</span></label>
+<div class="feedback good f13a"><strong>✅ 答對了｜+1 判斷晶片</strong><br>資料中的示範 Prompt 就要求 AI 提供「提示」、「我的思考盲點」、「參考資料」。<a class="next" href="#q14">下一題 →</a></div>
+<div class="feedback bad f13b"><strong>💡 這題再想一下</strong><br>資料要保留學習者自己的思考，不是把思考完全交給 AI。<a class="next" href="#q14">下一題 →</a></div>
+<div class="feedback bad f13c"><strong>💡 這題再想一下</strong><br>資料要保留學習者自己的思考，不是把思考完全交給 AI。<a class="next" href="#q14">下一題 →</a></div>
+<div class="feedback bad f13d"><strong>💡 這題再想一下</strong><br>資料要保留學習者自己的思考，不是把思考完全交給 AI。<a class="next" href="#q14">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q14">
+<div class="toprow"><span class="stage">🧩 LEVEL 3｜閱讀理解</span><span class="count">第 14 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:93%"></div></div>
+<article class="reading"><div class="reading-title">📖 閱讀資料</div><p>資料認為，當 AI 被拿來輔助學習課程內容或個人興趣時，真正的目標不是讓 AI 代替自己完成，而是透過自己的思考解決問題。因為 AI 可以根據個人情況提供個人化提示，所以提示詞應要求 AI 不要直接給正確答案，而是提供提示、指出思考盲點、提供參考資料。數學學習的示範甚至希望學生練習：理解問題、把原問題拆成小問題，再把小問題轉成可以處理的問題。</p></article>
+<h2>依照這段資料，AI 在學習中的最佳角色比較接近哪一個？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q14" id="q14a">
+<input autocomplete="off" type="radio" data-correct="0" name="q14" id="q14b">
+<input autocomplete="off" type="radio" data-correct="1" name="q14" id="q14c">
+<input autocomplete="off" type="radio" data-correct="0" name="q14" id="q14d">
+<label class="choice" for="q14a"><span class="letter">A</span><span>代寫作業的人</span></label>
+<label class="choice" for="q14b"><span class="letter">B</span><span>直接公布標準答案的人</span></label>
+<label class="choice" for="q14c"><span class="letter">C</span><span>依照你的狀況提供提示、幫你整理思考方向的學習助手</span></label>
+<label class="choice" for="q14d"><span class="letter">D</span><span>取代所有老師與課程的人</span></label>
+<div class="feedback bad f14a"><strong>💡 這題再想一下</strong><br>資料並沒有要 AI 取代思考、老師或課程，而是讓它成為提示型的學習助手。<a class="next" href="#q15">下一題 →</a></div>
+<div class="feedback bad f14b"><strong>💡 這題再想一下</strong><br>資料並沒有要 AI 取代思考、老師或課程，而是讓它成為提示型的學習助手。<a class="next" href="#q15">下一題 →</a></div>
+<div class="feedback good f14c"><strong>✅ 答對了｜+1 判斷晶片</strong><br>這最符合資料的定位：AI 的優勢是個人化提示，但真正解題與學習仍由學生自己完成。<a class="next" href="#q15">下一題 →</a></div>
+<div class="feedback bad f14d"><strong>💡 這題再想一下</strong><br>資料並沒有要 AI 取代思考、老師或課程，而是讓它成為提示型的學習助手。<a class="next" href="#q15">下一題 →</a></div>
+</section>
+<section class="screen quiz-screen" id="q15">
+<div class="toprow"><span class="stage">🏆 FINAL BOSS｜總決戰</span><span class="count">第 15 / 15 題</span></div>
+<div class="bar"><div class="fill" style="width:100%"></div></div>
+<h2>最後一題：哪一句最完整地符合兩份資料想傳達的 AI 使用觀念？</h2>
+<input autocomplete="off" type="radio" data-correct="0" name="q15" id="q15a">
+<input autocomplete="off" type="radio" data-correct="1" name="q15" id="q15b">
+<input autocomplete="off" type="radio" data-correct="0" name="q15" id="q15c">
+<input autocomplete="off" type="radio" data-correct="0" name="q15" id="q15d">
+<label class="choice" for="q15a"><span class="letter">A</span><span>AI 很方便，所以答案和影像都可以直接相信</span></label>
+<label class="choice" for="q15b"><span class="letter">B</span><span>AI 可以協助查資料與學習，但要查證來源、保留自己的思考，也不能只靠影像聲音判斷真人</span></label>
+<label class="choice" for="q15c"><span class="letter">C</span><span>為了安全，完全不要用 AI</span></label>
+<label class="choice" for="q15d"><span class="letter">D</span><span>AI 最重要的功能就是代替人完成所有事情</span></label>
+<div class="feedback bad f15a"><strong>💡 這題再想一下</strong><br>兩份資料的方向不是「完全不用 AI」，而是教你更有判斷力地使用 AI。<a class="next" href="#finish">完成挑戰 →</a></div>
+<div class="feedback good f15b"><strong>✅ 答對了｜+1 判斷晶片</strong><br>Boss 擊破！你把三個核心連在一起了：身分判斷不能只靠聲音影像、資訊要查證、學習要保留自己的思考。<a class="next" href="#finish">完成挑戰 →</a></div>
+<div class="feedback bad f15c"><strong>💡 這題再想一下</strong><br>兩份資料的方向不是「完全不用 AI」，而是教你更有判斷力地使用 AI。<a class="next" href="#finish">完成挑戰 →</a></div>
+<div class="feedback bad f15d"><strong>💡 這題再想一下</strong><br>兩份資料的方向不是「完全不用 AI」，而是教你更有判斷力地使用 AI。<a class="next" href="#finish">完成挑戰 →</a></div>
+</section>
+
+<section class="screen" id="finish">
+  <div class="score-card">
+    <div class="hero-icon">🏆</div>
+    <div class="kicker">任務結算</div>
+    <h1>你的 AI 判斷稱號</h1>
+    <div class="score-number"><span id="scoreValue">—</span><span style="font-size:1.4rem;color:#7b8190"> / 15</span></div>
+    <div class="badge" id="titleBadge">正在計算…</div>
+    <p class="rank-note" id="rankNote">完成 15 題後，這裡會依你的答題結果顯示稱號。</p>
+  </div>
+
+  <div class="title-table">
+    <div class="title-row"><span>🏆 AI 素養守門員</span><strong>15 分</strong></div>
+    <div class="title-row"><span>🛡️ AI 判讀高手</span><strong>13–14 分</strong></div>
+    <div class="title-row"><span>🔎 查證偵探</span><strong>10–12 分</strong></div>
+    <div class="title-row"><span>🧩 AI 練習生</span><strong>7–9 分</strong></div>
+    <div class="title-row"><span>🌱 AI 探索者</span><strong>0–6 分</strong></div>
+  </div>
+
+  <div class="selfbox">
+    <h2>最後 1 分鐘｜自己幫自己評分</h2>
+    <p>這裡沒有標準答案。請依你<strong>現在的感覺</strong>選 1～5 分，看看自己覺得懂了多少。</p>
+
+    <div class="selfrow">
+      <div class="selfq">① 我能注意到「視訊／聲音看起來很真」不代表身分一定是真的。</div>
+      <div class="scale">
+        <input type="radio" name="s1" id="s11" value="1"><label for="s11">1<br>還不熟</label>
+        <input type="radio" name="s1" id="s12" value="2"><label for="s12">2</label>
+        <input type="radio" name="s1" id="s13" value="3"><label for="s13">3<br>普通</label>
+        <input type="radio" name="s1" id="s14" value="4"><label for="s14">4</label>
+        <input type="radio" name="s1" id="s15" value="5"><label for="s15">5<br>很懂</label>
+      </div>
+    </div>
+
+    <div class="selfrow">
+      <div class="selfq">② AI 給我資料時，我知道要怎麼再確認來源。</div>
+      <div class="scale">
+        <input type="radio" name="s2" id="s21" value="1"><label for="s21">1<br>還不熟</label>
+        <input type="radio" name="s2" id="s22" value="2"><label for="s22">2</label>
+        <input type="radio" name="s2" id="s23" value="3"><label for="s23">3<br>普通</label>
+        <input type="radio" name="s2" id="s24" value="4"><label for="s24">4</label>
+        <input type="radio" name="s2" id="s25" value="5"><label for="s25">5<br>很懂</label>
+      </div>
+    </div>
+
+    <div class="selfrow">
+      <div class="selfq">③ 我知道怎麼請 AI「提示我」，而不是直接把答案給我。</div>
+      <div class="scale">
+        <input type="radio" name="s3" id="s31" value="1"><label for="s31">1<br>還不熟</label>
+        <input type="radio" name="s3" id="s32" value="2"><label for="s32">2</label>
+        <input type="radio" name="s3" id="s33" value="3"><label for="s33">3<br>普通</label>
+        <input type="radio" name="s3" id="s34" value="4"><label for="s34">4</label>
+        <input type="radio" name="s3" id="s35" value="5"><label for="s35">5<br>很懂</label>
+      </div>
+    </div>
+
+    <div class="self-result" id="selfResult"></div>
+    <p class="small">小提醒：答題分數和自評不一定會一樣。分數是在測「這次答對多少」，自評是在看「自己現在有多有把握」。</p>
+  </div>
+
+  <a class="home-link" href="" id="restartLink">重新挑戰</a>
+</section>
+
+<section class="screen" id="home">
+  <div class="hero-icon">🛡️🤖</div>
+  <div class="kicker">15 分鐘｜15 題｜國高中</div>
+  <h1>AI 任務基地<br>15 題生存挑戰</h1>
+  <p>這次不會只有短短選擇題。裡面混合了<strong>圖片情境題、閱讀理解題、快速判斷題</strong>，最後還會依你的分數給稱號，再做一次自己的理解度評分。</p>
+
+  <div class="mission-grid">
+    <div class="mini">🎥 3 題<br>圖片情境</div>
+    <div class="mini">📖 3 題<br>閱讀理解</div>
+    <div class="mini">⚡ 9 題<br>快速判斷</div>
+  </div>
+
+  <div class="notice">
+    ⏱️ 建議每題約 40～50 秒。<br>
+    ⭐ 每答對 1 題＝1 枚「判斷晶片」。<br>
+    🏆 最後會自動依總分顯示稱號。<br>
+    🪞 最後 1 分鐘會做「我到底懂了多少？」自評。
+  </div>
+
+  <a class="next" href="#q1">開始任務 →</a>
+</section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  function calculateScore(){
+    var checked = document.querySelectorAll('.quiz-screen input[type="radio"]:checked');
+    var score = 0;
+    checked.forEach(function(el){
+      if(el.getAttribute('data-correct') === '1') score += 1;
+    });
+    return score;
+  }
+
+  function getRank(score){
+    if(score === 15) return {
+      title:'🏆 AI 素養守門員',
+      note:'15 題全數破解！你能把防詐、查證與自主學習三個觀念連在一起。'
+    };
+    if(score >= 13) return {
+      title:'🛡️ AI 判讀高手',
+      note:'你的判斷相當穩定。再注意少數細節，就很接近完整掌握。'
+    };
+    if(score >= 10) return {
+      title:'🔎 查證偵探',
+      note:'你已經抓到大部分核心觀念，遇到資訊時記得把「查來源」變成固定習慣。'
+    };
+    if(score >= 7) return {
+      title:'🧩 AI 練習生',
+      note:'你已經有基本概念。可以再回想：身分怎麼判斷、資料怎麼查、AI 怎麼提示你學習。'
+    };
+    return {
+      title:'🌱 AI 探索者',
+      note:'你正在建立 AI 判斷力。這次最重要的不是分數，而是知道哪些地方需要再確認。'
+    };
+  }
+
+  function updateFinish(){
+    var score = calculateScore();
+    var rank = getRank(score);
+    var scoreEl = document.getElementById('scoreValue');
+    var badgeEl = document.getElementById('titleBadge');
+    var noteEl = document.getElementById('rankNote');
+    if(scoreEl) scoreEl.textContent = String(score);
+    if(badgeEl) badgeEl.textContent = rank.title;
+    if(noteEl) noteEl.textContent = rank.note;
+  }
+
+  function updateSelfAssessment(){
+    var groups = ['s1','s2','s3'];
+    var vals = [];
+    groups.forEach(function(name){
+      var el = document.querySelector('input[name="' + name + '"]:checked');
+      if(el) vals.push(Number(el.value));
+    });
+    var box = document.getElementById('selfResult');
+    if(!box) return;
+    if(vals.length < 3){
+      box.style.display = 'none';
+      return;
+    }
+    var avg = vals.reduce(function(a,b){return a+b;},0) / vals.length;
+    var msg = '';
+    if(avg >= 4.5) msg = '🌟 你的自評是「很有把握」。可以試著把今天的三個原則講給同學聽，看看自己能不能清楚解釋。';
+    else if(avg >= 3.5) msg = '👍 你的自評是「大致理解」。如果還有一個地方不確定，可以回頭看那一類題目的解析。';
+    else if(avg >= 2.5) msg = '🧭 你的自評是「理解一部分」。挑一個最不確定的主題再複習一次，會比全部重看更有效。';
+    else msg = '🌱 你的自評是「還在熟悉」。先記住三句：不要只信影像聲音、AI 資料要查來源、學習時請 AI 給提示。';
+    box.textContent = '自評平均：' + avg.toFixed(1) + ' / 5　' + msg;
+    box.style.display = 'block';
+  }
+
+  function onHashChange(){
+    if(location.hash === '#finish') updateFinish();
+  }
+
+  document.addEventListener('change', function(e){
+    if(e.target && /^s[123]$/.test(e.target.name || '')) updateSelfAssessment();
+  });
+
+  window.addEventListener('hashchange', onHashChange);
+  onHashChange();
+})();
+</script>
+</body>
+</html>
