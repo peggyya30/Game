@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 任務基地｜25 題生存挑戰</title>
+<style>
+:root{
+  --navy:#111831; --purple:#6657e8; --blue:#4f9df8; --mint:#3bcf9a;
+  --pink:#ff789a; --yellow:#ffd466; --ink:#1f2937; --muted:#667085; --line:#e7e9f2;
+  --good:#0a7652; --goodbg:#effdf6; --bad:#a01c42; --badbg:#fff3f6;
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:#111831}
+body{
+  margin:0;min-height:100vh;color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(79,157,248,.25),transparent 30%),
+    radial-gradient(circle at 100% 20%,rgba(255,120,154,.20),transparent 28%),
+    linear-gradient(135deg,#10162c,#211c4c);
+}
+button{font:inherit}
+.page{max-width:780px;margin:0 auto;padding:18px 14px 56px}
+.card{
+  background:rgba(255,255,255,.985);border-radius:24px;padding:24px 20px;
+  box-shadow:0 20px 55px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.72);
+}
+.hidden{display:none!important}
+.hero-icon{font-size:3.5rem;margin-bottom:8px}
+.kicker{
+  display:inline-block;background:#ede9fe;color:#5b21b6;padding:7px 11px;border-radius:999px;
+  font-weight:900;font-size:.9rem;margin-bottom:12px
+}
+h1{font-size:clamp(2rem,8vw,3.45rem);line-height:1.06;margin:0 0 14px}
+h2{font-size:1.34rem;line-height:1.55;margin:18px 0}
+p{line-height:1.75;color:#4b5563}
+.mission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.mini{padding:14px 10px;border-radius:16px;text-align:center;font-weight:850;background:#f8f8ff;border:1px solid #e9e9ff;line-height:1.5}
+.notice{background:#fff8db;border:1px solid #ffe08d;border-radius:16px;padding:14px;line-height:1.75;color:#5d4700;margin:16px 0}
+.start-btn,.restart-btn{
+  width:100%;border:0;cursor:pointer;text-align:center;color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  padding:15px 16px;border-radius:15px;font-weight:950;font-size:1.03rem;
+  box-shadow:0 8px 20px rgba(102,87,232,.18);touch-action:manipulation
+}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stage{background:#eeecff;color:#5142c8;border-radius:999px;padding:7px 10px;font-size:.86rem;font-weight:900}
+.count{white-space:nowrap;color:var(--muted);font-size:.9rem;font-weight:800}
+.bar{height:9px;background:#eef0f5;border-radius:999px;overflow:hidden;margin:15px 0 20px}
+.fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--mint));transition:.25s width}
+.status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.chips{font-weight:900;color:#5b21b6}
+.visual{border-radius:20px;overflow:hidden;background:#f7f8fc;border:1px solid #e7e9f2;margin:14px 0 18px}
+.visual svg{display:block;width:100%;height:auto}
+.reading{background:#f8f9fd;border:1px solid #e5e8f1;border-radius:18px;padding:17px 17px 10px;margin:14px 0 20px}
+.reading-title{font-weight:950;color:#4c3fc2;margin-bottom:8px}
+.reading p{margin-top:0;color:#364152;line-height:1.85}
+.answers{display:grid;gap:10px}
+.answer{
+  width:100%;display:flex;align-items:flex-start;gap:11px;text-align:left;
+  border:2px solid var(--line);border-radius:16px;padding:14px;background:#fff;cursor:pointer;
+  line-height:1.55;font-weight:750;transition:.12s;touch-action:manipulation
+}
+.answer:hover{border-color:#b9c2ff;background:#fbfbff;transform:translateY(-1px)}
+.answer:disabled{cursor:default}
+.answer.correct{border-color:#49c98e;background:var(--goodbg);color:#075c43}
+.answer.wrong{border-color:#ff8fa8;background:var(--badbg);color:#8d1737}
+.letter{width:31px;height:31px;flex:0 0 auto;display:grid;place-items:center;background:#f0f2f7;border-radius:10px;font-weight:1000;color:#4b5563}
+.feedback{
+  display:none;margin-top:16px;padding:15px;border-radius:16px;line-height:1.7;font-weight:650
+}
+.feedback.show{display:block}
+.feedback.good{background:var(--goodbg);color:var(--good);border:1px solid #b5efd1}
+.feedback.bad{background:var(--badbg);color:var(--bad);border:1px solid #ffc4d1}
+.autonote{font-size:.86rem;color:#81889a;text-align:center;margin:12px 0 0}
+.score-card{text-align:center;padding:8px 0}
+.score-number{font-size:4.5rem;font-weight:1000;line-height:1;color:#5c4ee4}
+.badge{display:inline-block;margin:12px auto;padding:9px 15px;border-radius:999px;background:#f0edff;color:#5142c8;font-weight:1000;font-size:1.1rem}
+.rank-note{max-width:560px;margin:0 auto 18px;color:#4b5563;line-height:1.7}
+.title-table{display:grid;gap:8px;margin:18px 0}
+.title-row{display:flex;justify-content:space-between;gap:12px;background:#f8f9fd;border:1px solid #e7e9f2;border-radius:13px;padding:11px 13px;font-size:.92rem}
+.selfbox{margin-top:24px;padding-top:20px;border-top:2px dashed #e3e5ed}
+.selfrow{padding:15px 0;border-bottom:1px solid #eef0f4}
+.selfq{font-weight:850;line-height:1.55;margin-bottom:10px}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.scale button{border:1.5px solid #e2e5ed;border-radius:12px;background:#fff;padding:10px 4px;cursor:pointer;font-weight:850;touch-action:manipulation}
+.scale button.selected{background:#eeecff;border-color:#7568e9;color:#5142c8}
+.self-result{display:none;margin-top:16px;padding:15px;border-radius:15px;background:#eef8ff;border:1px solid #cfe5ff;line-height:1.7}
+.small{font-size:.88rem;color:#7a8292}
+.footer-note{text-align:center;color:#d1d5e6;font-size:.82rem;margin-top:14px}
+@media(max-width:560px){
+  .card{padding:20px 14px;border-radius:18px}
+  .mission-grid{grid-template-columns:1fr}
+  h2{font-size:1.18rem}
+  .toprow{align-items:flex-start}
+  .scale button{font-size:.8rem}
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<section class="card" id="home">
+  <div class="hero-icon">🛡️🤖</div>
+  <div class="kicker">15 分鐘｜25 題｜國高中</div>
+  <h1>AI 任務基地<br>25 題生存挑戰</h1>
+  <p>這一版採用<strong>「按下答案就鎖定」</strong>的方式。每題只能作答一次，系統會記錄第一次選擇，短暫顯示解析後<strong>自動進入下一題</strong>，不會再出現「下一題」按鈕。</p>
+
+  <div class="mission-grid">
+    <div class="mini">🎨 多題<br>可愛圖片情境</div>
+    <div class="mini">📖 多題<br>閱讀理解</div>
+    <div class="mini">⚡ 25 題<br>自動前進</div>
+  </div>
+
+  <div class="notice">
+    ⭐ 每答對 1 題＝1 枚「判斷晶片」。<br>
+    🔒 點選後立即鎖定，連續點擊也不會重複計分。<br>
+    ⏩ 約 0.8 秒後自動跳到下一題。<br>
+    🏆 最後依 25 題總分顯示稱號，再做自我理解度評分。
+  </div>
+  <button class="start-btn" id="startBtn" type="button">開始任務 →</button>
+</section>
+
+<section class="card hidden" id="quiz">
+  <div class="toprow">
+    <span class="stage" id="stage"></span>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="bar"><div class="fill" id="progressFill"></div></div>
+  <div class="status-row">
+    <span class="chips" id="chipCount">⭐ 0 枚判斷晶片</span>
+    <span class="small">只能作答一次</span>
+  </div>
+  <div id="content"></div>
+  <p class="autonote">選答案後會自動進入下一題，不需要再按任何按鈕。</p>
+</section>
+
+<section class="card hidden" id="result">
+  <div class="score-card">
+    <div class="hero-icon">🏆</div>
+    <div class="kicker">任務結算</div>
+    <h1>你的 AI 判斷稱號</h1>
+    <div class="score-number"><span id="scoreValue">0</span><span style="font-size:1.4rem;color:#7b8190"> / 25</span></div>
+    <div class="badge" id="titleBadge"></div>
+    <p class="rank-note" id="rankNote"></p>
+  </div>
+
+  <div class="title-table">
+    <div class="title-row"><span>🏆 AI 素養守門員</span><strong>23–25 分</strong></div>
+    <div class="title-row"><span>🛡️ AI 判讀高手</span><strong>19–22 分</strong></div>
+    <div class="title-row"><span>🔎 查證偵探</span><strong>14–18 分</strong></div>
+    <div class="title-row"><span>🧩 AI 練習生</span><strong>9–13 分</strong></div>
+    <div class="title-row"><span>🌱 AI 探索者</span><strong>0–8 分</strong></div>
+  </div>
+
+  <div class="selfbox">
+    <h2>最後 1 分鐘｜自己幫自己評分</h2>
+    <p>這裡沒有標準答案。請依你<strong>現在的感覺</strong>，每題選 1～5 分。</p>
+    <div id="selfRows"></div>
+    <div class="self-result" id="selfResult"></div>
+    <p class="small">答題分數是在看「這次答對多少」，自評是在看「自己現在有多有把握」。兩者不一定相同。</p>
+  </div>
+  <button class="restart-btn" id="restartBtn" type="button">重新挑戰</button>
+</section>
+
+<div class="footer-note">AI 任務基地｜依課程資料設計</div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  const questions = [{"kind": "quick", "tag": "真假訊號站", "icon": "🕵️", "q": "網路上認識的人和你視訊過，之後突然開口要你匯錢。依照資料，哪一個判斷最重要？", "opts": ["有視訊過，所以身分一定是真的", "先看對方長得像不像照片", "注意對方是否主動索取貴重財物", "只要聊天夠久，就可以相信"], "ans": 2, "explain": "資料提醒：聲音與影像已不能單獨判定真偽；對方開始索取貴重財物時尤其要提高警覺。"}, {"kind": "image", "tag": "圖片情境", "icon": "🎥", "svg": "\n<svg viewBox=\"0 0 760 390\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格的視訊聊天與點數要求\">\n  <rect width=\"760\" height=\"390\" rx=\"30\" fill=\"#FFF7FB\"/>\n  <circle cx=\"98\" cy=\"70\" r=\"34\" fill=\"#FFE66D\"/>\n  <circle cx=\"655\" cy=\"74\" r=\"24\" fill=\"#B8F2E6\"/>\n  <rect x=\"42\" y=\"42\" width=\"292\" height=\"305\" rx=\"30\" fill=\"#25284A\"/>\n  <rect x=\"65\" y=\"65\" width=\"246\" height=\"206\" rx=\"24\" fill=\"#8B80F9\"/>\n  <circle cx=\"188\" cy=\"133\" r=\"46\" fill=\"#FFD7C7\"/>\n  <path d=\"M140 132c0-61 102-61 102 0-18-17-35-23-51-23-18 0-35 7-51 23Z\" fill=\"#493A58\"/>\n  <circle cx=\"173\" cy=\"139\" r=\"4\" fill=\"#2E2B3A\"/>\n  <circle cx=\"204\" cy=\"139\" r=\"4\" fill=\"#2E2B3A\"/>\n  <path d=\"M178 158q12 9 25 0\" stroke=\"#D16B73\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/>\n  <rect x=\"105\" y=\"188\" width=\"168\" height=\"60\" rx=\"30\" fill=\"#F7F3FF\"/>\n  <circle cx=\"294\" cy=\"87\" r=\"11\" fill=\"#FF6F91\"/>\n  <text x=\"88\" y=\"309\" font-family=\"sans-serif\" font-size=\"19\" fill=\"#fff\">視訊中…</text>\n\n  <rect x=\"384\" y=\"42\" width=\"330\" height=\"98\" rx=\"22\" fill=\"#fff\" stroke=\"#F2DCE7\"/>\n  <text x=\"411\" y=\"78\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"700\" fill=\"#2C3348\">「我的帳戶被鎖住了 😢」</text>\n  <text x=\"411\" y=\"108\" font-family=\"sans-serif\" font-size=\"18\" fill=\"#4F566C\">先幫我買 3,000 元點數好嗎？</text>\n\n  <rect x=\"418\" y=\"164\" width=\"296\" height=\"66\" rx=\"20\" fill=\"#FFF0F4\" stroke=\"#FFA6BA\" stroke-width=\"2\"/>\n  <text x=\"447\" y=\"204\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"700\" fill=\"#A31E43\">「我們都視訊過了耶！」</text>\n\n  <rect x=\"384\" y=\"258\" width=\"330\" height=\"64\" rx=\"20\" fill=\"#FFF8D9\"/>\n  <text x=\"410\" y=\"297\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"700\" fill=\"#745800\">🔎 你會注意哪個警訊？</text>\n</svg>\n", "q": "看完上面的情境，哪一個地方最值得你立刻提高警覺？", "opts": ["對方的畫面很清楚", "對方說帳戶被鎖，接著要求你買 3,000 元點數", "對方願意跟你視訊", "對方說話很自然"], "ans": 1, "explain": "關鍵不是畫面清不清楚，而是對方開始索取具有金錢價值的東西。"}, {"kind": "quick", "tag": "案例觀察", "icon": "📌", "q": "資料中的深偽 AI 交友詐騙案例，被害人數量大約是多少？", "opts": ["約 200 人", "約 2,000 人", "約 2 萬人", "約 20 萬人"], "ans": 2, "explain": "資料寫到被害人高達 2 萬人。"}, {"kind": "reading", "tag": "閱讀理解", "icon": "📖", "passage": "課程資料整理了一起深偽 AI 交友詐騙案例。該集團自行開發深偽 AI 技術及相關程式，用來偽裝身分並進行交友詐騙。資料指出，被害人數量非常多，也特別提醒：在現在的網路世界裡，聲音和影像已經不能單獨作為判斷真人身分的依據；判斷時更應注意對方是否開始主動索取貴重財物。", "q": "根據這段資料，作者最想提醒讀者的是什麼？", "opts": ["只要不開視訊就不會被騙", "網路上所有人都是假的", "不要只靠聲音影像判定真人，還要觀察是否出現索取財物等行為", "深偽技術只會出現在交友軟體"], "ans": 2, "explain": "重點是「不要只靠聲音影像判斷真人」，還要觀察對方的行為與金錢要求。"}, {"kind": "quick", "tag": "真假訊號站", "icon": "💸", "q": "下列哪一個情況最符合資料中的詐騙警訊？", "opts": ["網友問你今天吃什麼", "網友推薦一首歌", "網友請你先幫忙轉帳一筆錢", "網友分享旅遊照片"], "ans": 2, "explain": "主動索取金錢或其他貴重財物，是資料特別提醒要提高警覺的行為。"}, {"kind": "image", "tag": "圖片情境", "icon": "🙊", "svg": "\n<svg viewBox=\"0 0 760 390\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格的聊天訊息要求保密與轉帳\">\n  <rect width=\"760\" height=\"390\" rx=\"30\" fill=\"#F5FBFF\"/>\n  <rect x=\"70\" y=\"38\" width=\"620\" height=\"316\" rx=\"34\" fill=\"#FFFFFF\" stroke=\"#D9EAF7\" stroke-width=\"3\"/>\n  <circle cx=\"123\" cy=\"95\" r=\"30\" fill=\"#B8E0FF\"/>\n  <circle cx=\"116\" cy=\"91\" r=\"5\" fill=\"#25334A\"/>\n  <circle cx=\"133\" cy=\"91\" r=\"5\" fill=\"#25334A\"/>\n  <path d=\"M116 108q8 7 17 0\" stroke=\"#55728F\" stroke-width=\"3\" fill=\"none\"/>\n  <text x=\"166\" y=\"90\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"700\" fill=\"#273149\">網路朋友</text>\n  <text x=\"166\" y=\"116\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#7B8497\">剛剛上線</text>\n\n  <rect x=\"112\" y=\"154\" width=\"420\" height=\"62\" rx=\"18\" fill=\"#EEF3FF\"/>\n  <text x=\"137\" y=\"191\" font-family=\"sans-serif\" font-size=\"17\" fill=\"#334066\">可以先轉 2,000 元給我嗎？我等等還你。</text>\n\n  <rect x=\"245\" y=\"235\" width=\"375\" height=\"62\" rx=\"18\" fill=\"#FFF0F4\"/>\n  <text x=\"270\" y=\"272\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#A31E43\">不要跟爸媽說，這是我們的小秘密 🙊</text>\n\n  <circle cx=\"625\" cy=\"102\" r=\"32\" fill=\"#FFE992\"/>\n  <text x=\"610\" y=\"113\" font-family=\"sans-serif\" font-size=\"27\">⚠</text>\n</svg>\n", "q": "這段聊天同時出現「要錢」和「叫你保密」。最適合的反應是？", "opts": ["先轉一點點看看", "因為是秘密，所以更不能問別人", "先停下來，不付款，找可信任的人一起確認", "只要對方保證會還就可以"], "ans": 2, "explain": "遇到金錢要求時應先停下來查證，而不是被「保密」或情緒壓力推著做決定。"}, {"kind": "quick", "tag": "真假訊號站", "icon": "🧠", "q": "如果對方有漂亮照片、自然聲音、順暢視訊，但最後開始索取貴重財物，你應該？", "opts": ["因為前面都很真，所以照做", "因為聊很久，所以不用懷疑", "提高警覺，不把影像和聲音當成唯一判斷依據", "只要金額不大就沒關係"], "ans": 2, "explain": "即使影像與聲音看似真實，也不能直接當成身分證明。"}, {"kind": "quick", "tag": "AI 使用情境", "icon": "🤖", "q": "資料把「和 AI 對話學習」分成哪兩種主要情境？", "opts": ["聊天與畫圖", "查詢整理資料，以及輔助學習技能", "遊戲與音樂", "寫作業與考試"], "ans": 1, "explain": "資料分成「單純查詢、整理現有資料」與「請 AI 輔助學習某種技能」兩種情境。"}, {"kind": "image", "tag": "圖片情境", "icon": "🔎", "svg": "\n<svg viewBox=\"0 0 760 410\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格三種資料來源比較\">\n  <rect width=\"760\" height=\"410\" rx=\"30\" fill=\"#F3FAFF\"/>\n  <rect x=\"40\" y=\"38\" width=\"680\" height=\"76\" rx=\"22\" fill=\"#fff\" stroke=\"#D9EAF7\" stroke-width=\"2\"/>\n  <circle cx=\"84\" cy=\"76\" r=\"23\" fill=\"#7C6CF2\"/>\n  <text x=\"74\" y=\"84\" font-family=\"sans-serif\" font-size=\"19\" font-weight=\"800\" fill=\"#fff\">AI</text>\n  <text x=\"122\" y=\"71\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#2D3345\">「植物細胞有細胞壁。」</text>\n  <text x=\"122\" y=\"96\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#6B7280\">我找到三個來源：</text>\n\n  <rect x=\"40\" y=\"145\" width=\"210\" height=\"205\" rx=\"23\" fill=\"#fff\"/>\n  <circle cx=\"82\" cy=\"188\" r=\"24\" fill=\"#F1F3F7\"/>\n  <text x=\"70\" y=\"198\" font-size=\"25\">💬</text>\n  <text x=\"119\" y=\"191\" font-family=\"sans-serif\" font-size=\"16\" font-weight=\"800\" fill=\"#30384B\">匿名論壇</text>\n  <text x=\"62\" y=\"235\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#6B7280\">作者：coolboy777</text>\n  <text x=\"62\" y=\"263\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#6B7280\">日期：不明</text>\n  <text x=\"62\" y=\"305\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#8B4B5A\">「我記得有吧？」</text>\n\n  <rect x=\"275\" y=\"145\" width=\"210\" height=\"205\" rx=\"23\" fill=\"#fff\" stroke=\"#62D4A3\" stroke-width=\"3\"/>\n  <circle cx=\"318\" cy=\"188\" r=\"24\" fill=\"#E8FBF2\"/>\n  <text x=\"306\" y=\"198\" font-size=\"25\">🏫</text>\n  <text x=\"355\" y=\"191\" font-family=\"sans-serif\" font-size=\"16\" font-weight=\"800\" fill=\"#30384B\">教育單位教材</text>\n  <text x=\"297\" y=\"235\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#6B7280\">作者、機構清楚</text>\n  <text x=\"297\" y=\"263\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#6B7280\">有更新日期</text>\n  <text x=\"297\" y=\"305\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#257252\">可查看完整內容</text>\n\n  <rect x=\"510\" y=\"145\" width=\"210\" height=\"205\" rx=\"23\" fill=\"#fff\"/>\n  <circle cx=\"552\" cy=\"188\" r=\"24\" fill=\"#FFF1F5\"/>\n  <text x=\"540\" y=\"198\" font-size=\"25\">📱</text>\n  <text x=\"590\" y=\"191\" font-family=\"sans-serif\" font-size=\"16\" font-weight=\"800\" fill=\"#30384B\">短影音截圖</text>\n  <text x=\"532\" y=\"235\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#6B7280\">觀看數很多</text>\n  <text x=\"532\" y=\"263\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#6B7280\">原始出處不明</text>\n  <text x=\"532\" y=\"305\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#8B4B5A\">只剩一張截圖</text>\n</svg>\n", "q": "如果你要確認 AI 的答案，上圖三個來源中，依照資料原則，哪一個最值得先查看？", "opts": ["匿名論壇留言", "教育單位教材", "只有截圖的短影音", "三個都不用看，AI 已經回答了"], "ans": 1, "explain": "資料要求確認來源是否合理；作者、機構與內容都較清楚的來源，更符合查證方向。"}, {"kind": "quick", "tag": "查證實驗室", "icon": "🏫", "q": "你問 AI 一個專業問題。依照資料，最重要的是？", "opts": ["只要 AI 說得詳細就可以", "確認資料來源有公信力，最後再詢問老師或專業人員", "問很多次 AI，答案一樣就代表一定正確", "只看網友留言"], "ans": 1, "explain": "專業問題要確認有公信力的資料來源，最後還要詢問學校老師或專業人員。"}, {"kind": "reading", "tag": "閱讀理解", "icon": "📚", "passage": "資料把 AI 的「查詢、整理現有資料」分成專業問題與日常問題。像喉嚨痛、家中內部電線更新、法律問題，被列為專業問題：不只要確認資料來源具有公信力，真的要採取行動前，還應詢問學校老師或專業人員。至於歷史常識、植物細胞壁、腳踏車落鏈、讀書計畫或旅遊行程等日常問題，也仍然要確認 AI 提供的資訊是否正確，並實際查看它引用的來源。", "q": "從這段資料可以得到哪一個最完整的結論？", "opts": ["只有專業問題需要查證", "日常問題一定不會出錯", "不同問題風險不同，但不論專業或日常，都需要確認資訊；專業問題還要再找專業人士", "只要 AI 有引用來源，所有問題都可以直接照做"], "ans": 2, "explain": "兩類問題都要確認資訊，但專業問題需要更進一步找老師或專業人士。"}, {"kind": "quick", "tag": "日常查詢", "icon": "🌿", "q": "下面哪一個是資料列出的「非專業／日常問題」例子？", "opts": ["家裡內部電線怎麼換新", "我做某件事違不違法", "植物有沒有細胞壁", "喉嚨痛怎麼辦"], "ans": 2, "explain": "「植物有沒有細胞壁」被列為日常問題例子；其他選項在資料中屬於專業問題。"}, {"kind": "image", "tag": "圖片情境", "icon": "🗺️", "svg": "\n<svg viewBox=\"0 0 760 410\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格旅遊行程與查證\">\n  <rect width=\"760\" height=\"410\" rx=\"30\" fill=\"#FFF9EE\"/>\n  <circle cx=\"95\" cy=\"82\" r=\"35\" fill=\"#FFD86E\"/>\n  <text x=\"78\" y=\"94\" font-size=\"33\">☀️</text>\n\n  <rect x=\"65\" y=\"125\" width=\"290\" height=\"220\" rx=\"26\" fill=\"#fff\" stroke=\"#F1E2BF\" stroke-width=\"2\"/>\n  <text x=\"92\" y=\"165\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#3A4254\">AI 幫你排的行程</text>\n  <text x=\"92\" y=\"207\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#596174\">09:00 博物館</text>\n  <text x=\"92\" y=\"241\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#596174\">12:00 午餐</text>\n  <text x=\"92\" y=\"275\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#596174\">14:00 公園</text>\n  <text x=\"92\" y=\"309\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#596174\">17:00 回家</text>\n\n  <rect x=\"405\" y=\"105\" width=\"290\" height=\"242\" rx=\"26\" fill=\"#F1FAFF\" stroke=\"#CBE7F7\" stroke-width=\"2\"/>\n  <circle cx=\"548\" cy=\"177\" r=\"52\" fill=\"#B8E4FF\"/>\n  <circle cx=\"530\" cy=\"169\" r=\"5\" fill=\"#2F4152\"/>\n  <circle cx=\"566\" cy=\"169\" r=\"5\" fill=\"#2F4152\"/>\n  <path d=\"M530 194q18 13 36 0\" stroke=\"#507087\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/>\n  <text x=\"451\" y=\"263\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"800\" fill=\"#2C5167\">出發前要不要查一下</text>\n  <text x=\"463\" y=\"295\" font-family=\"sans-serif\" font-size=\"17\" fill=\"#43697F\">開館時間、交通資訊？</text>\n</svg>\n", "q": "AI 幫你排好旅遊行程後，依照資料最合適的下一步是？", "opts": ["直接照行程走，不用再看", "出發前確認開館時間、交通等資訊是否正確", "只要排得漂亮就代表可信", "把同一題再問 AI 十次"], "ans": 1, "explain": "安排旅遊行程屬日常問題，AI 可以協助整理，但仍要確認資訊是否正確。"}, {"kind": "quick", "tag": "查證實驗室", "icon": "🔍", "q": "AI 回答問題後附上資料來源，你下一步最符合資料建議的做法是？", "opts": ["有附來源就直接相信", "點進來源，看來源從哪裡來、內容是否合理", "看 AI 語氣有沒有很肯定", "只看標題就好"], "ans": 1, "explain": "資料明確要求：要點進 AI 回傳的資料來源，確認來源與內容是否合理。"}, {"kind": "quick", "tag": "查證實驗室", "icon": "📎", "q": "為什麼「AI 有附來源」還不能直接代表答案一定正確？", "opts": ["因為來源可能和答案內容不相符，也可能不夠可信", "因為所有來源都是假的", "因為 AI 永遠不能查資料", "因為只有紙本資料才可信"], "ans": 0, "explain": "資料要求實際點進來源查看，就是因為來源本身仍需要判斷是否合理。"}, {"kind": "image", "tag": "圖片情境", "icon": "💬", "svg": "\n<svg viewBox=\"0 0 760 410\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格兩種向 AI 問數學的方法\">\n  <rect width=\"760\" height=\"410\" rx=\"30\" fill=\"#F8F4FF\"/>\n  <rect x=\"36\" y=\"38\" width=\"315\" height=\"328\" rx=\"26\" fill=\"#fff\"/>\n  <text x=\"62\" y=\"78\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#443B58\">做法 A</text>\n  <rect x=\"61\" y=\"103\" width=\"264\" height=\"76\" rx=\"20\" fill=\"#F0ECFF\"/>\n  <text x=\"82\" y=\"133\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#493E77\">「直接把答案告訴我」</text>\n  <text x=\"82\" y=\"158\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#493E77\">「我要交作業」</text>\n  <rect x=\"90\" y=\"205\" width=\"235\" height=\"90\" rx=\"20\" fill=\"#FFF1F4\"/>\n  <text x=\"112\" y=\"237\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#A01C42\">AI：完整解答如下……</text>\n  <text x=\"112\" y=\"267\" font-family=\"sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#A01C42\">答案是 42。</text>\n\n  <rect x=\"409\" y=\"38\" width=\"315\" height=\"328\" rx=\"26\" fill=\"#fff\"/>\n  <text x=\"435\" y=\"78\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#443B58\">做法 B</text>\n  <rect x=\"434\" y=\"103\" width=\"264\" height=\"84\" rx=\"20\" fill=\"#E9FBF3\"/>\n  <text x=\"455\" y=\"133\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#126A4A\">「不要直接給答案」</text>\n  <text x=\"455\" y=\"160\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#126A4A\">「先提示我第一步」</text>\n  <rect x=\"463\" y=\"212\" width=\"235\" height=\"103\" rx=\"20\" fill=\"#EDF7FF\"/>\n  <text x=\"484\" y=\"241\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#2F5B78\">AI：先想想題目要找什麼？</text>\n  <text x=\"484\" y=\"270\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#2F5B78\">你目前想到哪一步？</text>\n</svg>\n", "q": "上圖兩種問法中，哪一種更符合資料中的 AI 學習方式？", "opts": ["做法 A，因為拿答案最快", "做法 B，因為 AI 只提供提示，保留自己的思考", "兩種完全一樣", "只要 AI 回答很多字就算學習"], "ans": 1, "explain": "資料建議讓 AI 給提示、指出盲點與提供參考資料，而不是直接代替學習者完成。"}, {"kind": "quick", "tag": "AI 學習訓練場", "icon": "📐", "q": "如果你的目標是「真的學會數學」，哪一句 Prompt 最符合資料建議？", "opts": ["直接把答案告訴我", "幫我把整份作業完成", "不要直接給答案，請先給我一個提示", "只告訴我最後答案"], "ans": 2, "explain": "用 AI 學習時，要請 AI 提示自己思考，而不是直接提供正確答案。"}, {"kind": "reading", "tag": "閱讀理解", "icon": "🧩", "passage": "資料認為，當 AI 被拿來輔助學習課程內容或個人興趣時，真正的目標不是讓 AI 代替自己完成，而是透過自己的思考解決問題。因為 AI 可以根據個人情況提供個人化提示，所以提示詞應要求 AI 不要直接給正確答案，而是提供提示、指出思考盲點、提供參考資料。", "q": "依照這段資料，AI 在學習中的最佳角色比較接近哪一個？", "opts": ["代寫作業的人", "直接公布標準答案的人", "依照你的狀況提供提示、幫你整理思考方向的學習助手", "取代所有老師與課程的人"], "ans": 2, "explain": "AI 的優勢是個人化提示，但真正解題與學習仍由學生自己完成。"}, {"kind": "quick", "tag": "AI 學習訓練場", "icon": "💡", "q": "資料中的示範 Prompt，希望 AI 提供哪一組內容？", "opts": ["提示、思考盲點、參考資料", "直接答案、作業成品、考試答案", "只有最後答案", "只要鼓勵的話"], "ans": 0, "explain": "資料中的示範 Prompt 明確要求「提示」、「我的思考盲點」、「參考資料」。"}, {"kind": "image", "tag": "圖片情境", "icon": "🧠", "svg": "\n<svg viewBox=\"0 0 760 410\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格 AI 提示學生解數學題\">\n  <rect width=\"760\" height=\"410\" rx=\"30\" fill=\"#F2FBF8\"/>\n  <rect x=\"55\" y=\"55\" width=\"275\" height=\"295\" rx=\"26\" fill=\"#fff\"/>\n  <circle cx=\"192\" cy=\"131\" r=\"50\" fill=\"#FFD7C7\"/>\n  <path d=\"M144 130c2-58 96-61 98 2-18-13-33-18-48-18-17 0-33 5-50 16Z\" fill=\"#3B3A54\"/>\n  <circle cx=\"177\" cy=\"138\" r=\"4\" fill=\"#242633\"/>\n  <circle cx=\"207\" cy=\"138\" r=\"4\" fill=\"#242633\"/>\n  <path d=\"M179 157q13 7 26 0\" stroke=\"#D16B73\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/>\n  <text x=\"104\" y=\"223\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#3E475B\">「這題我卡住了…」</text>\n  <text x=\"104\" y=\"256\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#5E6678\">不要直接給答案！</text>\n\n  <rect x=\"388\" y=\"66\" width=\"315\" height=\"250\" rx=\"28\" fill=\"#EEF6FF\" stroke=\"#CDE3FA\" stroke-width=\"2\"/>\n  <circle cx=\"545\" cy=\"129\" r=\"44\" fill=\"#9DD8FF\"/>\n  <rect x=\"516\" y=\"111\" width=\"58\" height=\"38\" rx=\"14\" fill=\"#fff\"/>\n  <circle cx=\"533\" cy=\"128\" r=\"4\" fill=\"#36546B\"/>\n  <circle cx=\"557\" cy=\"128\" r=\"4\" fill=\"#36546B\"/>\n  <path d=\"M535 140q10 6 20 0\" stroke=\"#55758B\" stroke-width=\"3\" fill=\"none\"/>\n  <text x=\"427\" y=\"207\" font-family=\"sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#2F5B78\">AI 提示：</text>\n  <text x=\"427\" y=\"238\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#405F74\">先把題目拆成兩個小問題。</text>\n  <text x=\"427\" y=\"270\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#405F74\">你覺得第一步要找什麼？</text>\n</svg>\n", "q": "圖中的 AI 先請學生把問題拆小、再問他目前想到哪一步。這種方式有什麼好處？", "opts": ["讓學生不用思考", "保留學生自己的解題過程，同時得到個人化提示", "保證每次答案都百分之百正確", "讓作業可以最快抄完"], "ans": 1, "explain": "這符合資料想培養的自主學習：理解問題、拆成小問題，再逐步解決。"}, {"kind": "quick", "tag": "AI 學習訓練場", "icon": "🎯", "q": "為什麼資料不建議「AI 說什麼答案就是什麼」？", "opts": ["因為這樣會失去自己的思考，也可能吸收錯誤資訊", "因為 AI 完全不能用", "因為所有 AI 答案一定錯", "因為只有老師可以回答問題"], "ans": 0, "explain": "資料指出，要透過自己的思考解決問題，才有學習效果，也能降低吸收錯誤資訊的機率。"}, {"kind": "reading", "tag": "閱讀理解", "icon": "🔢", "passage": "數學學習的示範提示詞，希望學生能培養一個從理解問題到解決問題的思維能力：先理解問題，再把原問題拆成小問題，接著把小問題轉換成數學上可以處理的問題。AI 的工作是依照學生目前的狀況提供提示，而不是直接公布正確答案。", "q": "這段資料最強調哪一種能力？", "opts": ["快速抄到答案", "把複雜問題拆解並逐步解決", "只記住固定公式", "讓 AI 代替自己思考"], "ans": 1, "explain": "資料重點是建立「理解 → 拆解 → 轉換 → 解決」的自主解題思維。"}, {"kind": "image", "tag": "圖片情境", "icon": "🔌", "svg": "\n<svg viewBox=\"0 0 760 410\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格家中電線安全情境\">\n  <rect width=\"760\" height=\"410\" rx=\"30\" fill=\"#FFF8EF\"/>\n  <rect x=\"45\" y=\"60\" width=\"305\" height=\"285\" rx=\"28\" fill=\"#fff\"/>\n  <rect x=\"112\" y=\"114\" width=\"95\" height=\"128\" rx=\"12\" fill=\"#EFEFEF\" stroke=\"#C9C9C9\" stroke-width=\"3\"/>\n  <circle cx=\"145\" cy=\"155\" r=\"12\" fill=\"#444\"/>\n  <circle cx=\"175\" cy=\"155\" r=\"12\" fill=\"#444\"/>\n  <path d=\"M210 168q28-25 55-3\" stroke=\"#FF8B3D\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\"/>\n  <path d=\"M236 151l16-19\" stroke=\"#FFCC48\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n  <path d=\"M252 163l24-7\" stroke=\"#FFCC48\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n  <text x=\"85\" y=\"291\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#6D4F35\">插座冒火花！</text>\n\n  <rect x=\"395\" y=\"67\" width=\"320\" height=\"270\" rx=\"28\" fill=\"#F1F8FF\" stroke=\"#D4E8F8\" stroke-width=\"2\"/>\n  <circle cx=\"555\" cy=\"133\" r=\"42\" fill=\"#A9DCFF\"/>\n  <rect x=\"528\" y=\"116\" width=\"54\" height=\"35\" rx=\"13\" fill=\"#fff\"/>\n  <circle cx=\"543\" cy=\"132\" r=\"4\" fill=\"#34546A\"/>\n  <circle cx=\"566\" cy=\"132\" r=\"4\" fill=\"#34546A\"/>\n  <text x=\"440\" y=\"209\" font-family=\"sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#2D526A\">AI：自己拆開重新接線就好！</text>\n  <text x=\"442\" y=\"249\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#5A6C78\">你會直接照做嗎？</text>\n</svg>\n", "q": "家裡插座冒火花，AI 卻叫你自己拆開重接。依照資料，你最應該怎麼做？", "opts": ["直接照 AI 步驟做", "再問另一個 AI，只要答案一樣就做", "停止操作，找可信任的成人或專業人員確認", "看哪個網友留言按讚最多"], "ans": 2, "explain": "家中電線屬專業、高風險問題；資料要求確認公信力來源，實際操作前還要詢問老師或專業人員。"}, {"kind": "quick", "tag": "綜合判斷", "icon": "🛡️", "q": "下面哪一句最符合整份資料對 AI 的態度？", "opts": ["AI 很危險，所以完全不能用", "AI 很方便，所以什麼都可以直接相信", "AI 可以協助，但重要資訊要查證、學習仍要自己思考", "只要 AI 說得很詳細就一定正確"], "ans": 2, "explain": "資料不是反對 AI，而是強調「有判斷力地使用 AI」。"}, {"kind": "image", "tag": "FINAL BOSS", "icon": "🏆", "svg": "\n<svg viewBox=\"0 0 760 410\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"可愛風格 AI 素養終極挑戰\">\n  <rect width=\"760\" height=\"410\" rx=\"30\" fill=\"#F8F6FF\"/>\n  <circle cx=\"380\" cy=\"186\" r=\"94\" fill=\"#6F63E9\"/>\n  <path d=\"M380 103l64 26v55c0 69-43 104-64 116-21-12-64-47-64-116v-55Z\" fill=\"#fff\" opacity=\".97\"/>\n  <circle cx=\"380\" cy=\"173\" r=\"36\" fill=\"#A9DFFF\"/>\n  <rect x=\"354\" y=\"158\" width=\"52\" height=\"34\" rx=\"13\" fill=\"#fff\"/>\n  <circle cx=\"370\" cy=\"175\" r=\"4\" fill=\"#35576F\"/>\n  <circle cx=\"391\" cy=\"175\" r=\"4\" fill=\"#35576F\"/>\n  <path d=\"M371 187q9 6 18 0\" stroke=\"#55788D\" stroke-width=\"3\" fill=\"none\"/>\n  <text x=\"351\" y=\"239\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"800\" fill=\"#4F47B7\">AI 防護盾</text>\n\n  <rect x=\"60\" y=\"87\" width=\"200\" height=\"76\" rx=\"22\" fill=\"#FFF0F4\"/>\n  <text x=\"84\" y=\"120\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#9F2344\">🎥 影像 ≠ 身分證明</text>\n  <text x=\"84\" y=\"147\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#7C4351\">先看行為與金錢要求</text>\n\n  <rect x=\"500\" y=\"87\" width=\"200\" height=\"76\" rx=\"22\" fill=\"#EEF7FF\"/>\n  <text x=\"524\" y=\"120\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#285C7A\">🔎 AI 資料要查來源</text>\n  <text x=\"524\" y=\"147\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#4A6574\">不要只看語氣</text>\n\n  <rect x=\"60\" y=\"260\" width=\"200\" height=\"76\" rx=\"22\" fill=\"#EAFBF4\"/>\n  <text x=\"84\" y=\"293\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#146747\">🧠 學習要自己思考</text>\n  <text x=\"84\" y=\"320\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#45715F\">讓 AI 給提示</text>\n\n  <rect x=\"500\" y=\"260\" width=\"200\" height=\"76\" rx=\"22\" fill=\"#FFF8D9\"/>\n  <text x=\"524\" y=\"293\" font-family=\"sans-serif\" font-size=\"17\" font-weight=\"700\" fill=\"#6F5800\">🛠 專業問題找專家</text>\n  <text x=\"524\" y=\"320\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#7C6A2C\">AI 只能輔助</text>\n</svg>\n", "q": "最後一題：哪一句最完整地把今天的三個核心觀念連在一起？", "opts": ["影像很真就代表真人；AI 有來源就能直接信；學習越快拿答案越好", "不要只靠聲音影像判定真人；AI 資料要查來源；學習時保留自己的思考", "為了安全，完全不要用 AI", "只要多問幾個 AI，就不用找專業人士"], "ans": 1, "explain": "三個核心是：身分不能只靠聲音影像、資訊要查證、學習要保留自己的思考。"}];
+  const AUTO_DELAY = 800;
+  let current = 0;
+  let answers = new Array(questions.length).fill(null);
+  let locked = false;
+  let timer = null;
+
+  const home = document.getElementById("home");
+  const quiz = document.getElementById("quiz");
+  const result = document.getElementById("result");
+  const stage = document.getElementById("stage");
+  const count = document.getElementById("count");
+  const progressFill = document.getElementById("progressFill");
+  const chipCount = document.getElementById("chipCount");
+  const content = document.getElementById("content");
+
+  function scoreNow(){
+    let s = 0;
+    for(let i=0;i<answers.length;i++){
+      if(answers[i] !== null && answers[i] === questions[i].ans) s++;
+    }
+    return s;
+  }
+
+  function start(){
+    current = 0;
+    answers = new Array(questions.length).fill(null);
+    locked = false;
+    if(timer) clearTimeout(timer);
+    home.classList.add("hidden");
+    result.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    render();
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+
+  function render(){
+    locked = false;
+    if(current >= questions.length){
+      showResult();
+      return;
+    }
+    const q = questions[current];
+    stage.textContent = q.icon + " " + q.tag;
+    count.textContent = "第 " + (current+1) + " / " + questions.length + " 題";
+    progressFill.style.width = (((current+1)/questions.length)*100) + "%";
+    chipCount.textContent = "⭐ " + scoreNow() + " 枚判斷晶片";
+
+    let html = "";
+    if(q.kind === "image"){
+      html += '<div class="visual">' + q.svg + '</div>';
+    }
+    if(q.kind === "reading"){
+      html += '<article class="reading"><div class="reading-title">📖 閱讀資料</div><p>' + escapeHtml(q.passage) + '</p></article>';
+    }
+    html += '<h2>' + escapeHtml(q.q) + '</h2>';
+    html += '<div class="answers">';
+    q.opts.forEach((opt,idx)=>{
+      html += '<button type="button" class="answer" data-choice="' + idx + '" data-correct="' + (idx===q.ans ? '1':'0') + '"><span class="letter">' + String.fromCharCode(65+idx) + '</span><span>' + escapeHtml(opt) + '</span></button>';
+    });
+    html += '</div>';
+    html += '<div class="feedback" id="feedback"></div>';
+    content.innerHTML = html;
+
+    content.querySelectorAll(".answer").forEach(btn=>{
+      btn.addEventListener("click", choose, {once:true});
+    });
+  }
+
+  function choose(event){
+    if(locked) return;
+    locked = true;
+    const q = questions[current];
+    const choice = Number(event.currentTarget.dataset.choice);
+
+    // Record exactly one answer for this question.
+    answers[current] = choice;
+
+    // Lock all answer buttons immediately so repeated taps cannot change score.
+    const buttons = Array.from(content.querySelectorAll(".answer"));
+    buttons.forEach(b=>b.disabled = true);
+
+    if(choice === q.ans){
+      event.currentTarget.classList.add("correct");
+    } else {
+      event.currentTarget.classList.add("wrong");
+      const correctBtn = buttons[q.ans];
+      if(correctBtn) correctBtn.classList.add("correct");
+    }
+
+    chipCount.textContent = "⭐ " + scoreNow() + " 枚判斷晶片";
+
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show " + (choice === q.ans ? "good" : "bad");
+    fb.innerHTML = (choice === q.ans ? "✅ <strong>答對了！</strong> " : "💡 <strong>線索解鎖：</strong> ") + escapeHtml(q.explain);
+
+    // Move forward automatically. No "next" button exists.
+    timer = setTimeout(()=>{
+      current += 1;
+      render();
+      window.scrollTo({top:0,behavior:"instant"});
+    }, AUTO_DELAY);
+  }
+
+  function getRank(score){
+    if(score >= 23) return ["🏆 AI 素養守門員","你已經能把防詐、查證與自主學習三個核心觀念連在一起。"];
+    if(score >= 19) return ["🛡️ AI 判讀高手","你的判斷很穩定，再注意少數細節就非常完整。"];
+    if(score >= 14) return ["🔎 查證偵探","你已抓到大部分核心觀念，繼續把查來源變成固定習慣。"];
+    if(score >= 9) return ["🧩 AI 練習生","你已經有基本概念，可以再複習身分判斷、來源查證與提示式學習。"];
+    return ["🌱 AI 探索者","你正在建立 AI 判斷力。這次最重要的是知道哪些地方需要再確認。"];
+  }
+
+  function showResult(){
+    quiz.classList.add("hidden");
+    result.classList.remove("hidden");
+    const score = scoreNow();
+    const rank = getRank(score);
+    document.getElementById("scoreValue").textContent = String(score);
+    document.getElementById("titleBadge").textContent = rank[0];
+    document.getElementById("rankNote").textContent = rank[1];
+    buildSelfAssessment();
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+
+  function buildSelfAssessment(){
+    const items = [
+      "我知道聲音、影像或視訊看起來很真，也不代表身分一定是真的。",
+      "AI 給我資料時，我知道要怎麼再確認來源。",
+      "遇到專業或高風險問題，我知道不能只依賴 AI。",
+      "我知道怎麼請 AI 給我提示，而不是直接替我完成答案。"
+    ];
+    const box = document.getElementById("selfRows");
+    box.innerHTML = "";
+    items.forEach((text,idx)=>{
+      const row = document.createElement("div");
+      row.className = "selfrow";
+      row.innerHTML = '<div class="selfq">' + (idx+1) + "、" + escapeHtml(text) + '</div><div class="scale">' +
+        [1,2,3,4,5].map(v=>'<button type="button" data-self="'+idx+'" data-value="'+v+'">'+(v===1?'1<br>還不熟':v===3?'3<br>普通':v===5?'5<br>很懂':v)+'</button>').join("") +
+        '</div>';
+      box.appendChild(row);
+    });
+    document.getElementById("selfResult").style.display = "none";
+    box.querySelectorAll("button[data-self]").forEach(btn=>btn.addEventListener("click", selectSelf));
+  }
+
+  function selectSelf(event){
+    const idx = event.currentTarget.dataset.self;
+    document.querySelectorAll('button[data-self="'+idx+'"]').forEach(b=>b.classList.remove("selected"));
+    event.currentTarget.classList.add("selected");
+    updateSelf();
+  }
+
+  function updateSelf(){
+    const groups = [0,1,2,3];
+    const vals = [];
+    groups.forEach(idx=>{
+      const selected = document.querySelector('button[data-self="'+idx+'"].selected');
+      if(selected) vals.push(Number(selected.dataset.value));
+    });
+    const box = document.getElementById("selfResult");
+    if(vals.length < 4){
+      box.style.display = "none";
+      return;
+    }
+    const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+    let msg = "";
+    if(avg >= 4.5) msg = "🌟 很有把握：試著把今天的原則講給同學聽，看看自己能不能清楚解釋。";
+    else if(avg >= 3.5) msg = "👍 大致理解：如果有一個地方還不確定，可以只回頭複習那一類題目。";
+    else if(avg >= 2.5) msg = "🧭 理解一部分：挑一個最不確定的主題再複習一次。";
+    else msg = "🌱 還在熟悉：先記住三句——不要只信影像聲音、AI 資料要查來源、學習時請 AI 給提示。";
+    box.textContent = "自評平均：" + avg.toFixed(1) + " / 5　" + msg;
+    box.style.display = "block";
+  }
+
+  function escapeHtml(text){
+    return String(text).replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  }
+
+  document.getElementById("startBtn").addEventListener("click", start);
+  document.getElementById("restartBtn").addEventListener("click", start);
+})();
+</script>
+</body>
+</html>
